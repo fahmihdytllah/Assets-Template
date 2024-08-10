@@ -472,7 +472,7 @@ $(function () {
       const campaignReportChartEl = document.querySelector('#campaignReportChart'),
         campaignReportChartConfig = CampaignReportsBarChart(res.chartData, res.categoryData, res.largesIndex);
 
-      if (!res.largesIndex.length) {
+      if (!res.largesIndex) {
         $('#campaignReportChart').html(`<span class="text-center text-muted">You don't have a post yet...</span>`);
       } else {
         if (typeof campaignReportChartEl !== undefined && campaignReportChartEl !== null) {
