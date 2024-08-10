@@ -154,10 +154,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
           success: function (res) {
             formAuth.unblock();
             toastr.success(res.msg, 'Good Job!');
-            setTimeout(() => {
-              const redirectUri = getParam('redirectTo');
-              window.location.href = redirectUri ? redirectUri : res?.redirect_uri;
-            }, 2000);
+            if (res?.redirectTo) {
+              setTimeout(() => {
+                const redirectUri = getParam('redirectTo');
+                window.location.href = redirectUri ? redirectUri : res?.redirectTo;
+              }, 2000);
+            }
           },
           error: function (error) {
             formAuth.unblock();
@@ -178,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
   })();
 });
 
-function callbackGoogle(response) {
+function callbackGoogleLogin(response) {
   // Load Google reCapctha
   if (typeof grecaptcha === 'object') {
     loadCaptcha();
@@ -191,16 +193,48 @@ function callbackGoogle(response) {
   });
 
   $.ajax({
-    data: `google_credential=${response.credential}&_token=${token}`,
-    url: '/auth/google_login',
+    data: `credential=${response.credential}&token=${token}`,
+    url: '/auth/googleLogin',
     type: 'POST',
     success: function (res) {
       $.unblockUI();
       toastr.success(res.msg, 'Good Job!');
       setTimeout(() => {
         const redirectUri = getParam('redirectTo');
-        window.location.href = redirectUri ? redirectUri : res?.redirect_uri;
-      }, 2000);
+        window.location.href = redirectUri ? redirectUri : res?.redirectTo;
+      }, 1500);
+    },
+    error: function (e) {
+      $.unblockUI();
+      const msg = e.responseJSON.msg;
+      toastr.error(msg, 'Opss!');
+    },
+  });
+}
+
+function callbackGoogleRegister(response) {
+  // Load Google reCapctha
+  if (typeof grecaptcha === 'object') {
+    loadCaptcha();
+  }
+
+  $.blockUI({
+    message: elementLoader,
+    css: { backgroundColor: 'transparent', border: '0' },
+    overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+  });
+
+  $.ajax({
+    data: `credential=${response.credential}&token=${token}`,
+    url: '/auth/googleRegister',
+    type: 'POST',
+    success: function (res) {
+      $.unblockUI();
+      toastr.success(res.msg, 'Good Job!');
+      setTimeout(() => {
+        const redirectUri = getParam('redirectTo');
+        window.location.href = redirectUri ? redirectUri : res?.redirectTo;
+      }, 1500);
     },
     error: function (e) {
       $.unblockUI();

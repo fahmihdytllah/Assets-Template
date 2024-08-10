@@ -1,8 +1,8 @@
 $(function () {
-  loadHistory()
+  loadHistory();
 
   $(document).on('click', '.btn-upgrade', function () {
-    let type = $(this).data('type')
+    let type = $(this).data('type');
 
     Swal.fire({
       text: 'Are you sure you want to upgrade this account?',
@@ -11,48 +11,48 @@ $(function () {
       confirmButtonText: 'Yes',
       customClass: {
         confirmButton: 'btn btn-primary waves-effect waves-light',
-        cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light'
+        cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light',
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        upgradePlans(type)
+        upgradePlans(type);
       }
-    })
-  })
+    });
+  });
 
   function upgradePlans(type) {
     $.blockUI({
       message: elementLoader,
       css: { backgroundColor: 'transparent', border: '0' },
-      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-    })
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       url: '/api/payment',
       data: { type },
       type: 'POST',
       success: function (res) {
-        $.unblockUI()
-        handlerPay(res.token)
+        $.unblockUI();
+        handlerPay(res.token);
       },
       error: function (e) {
-        $.unblockUI()
-        const msg = e.responseJSON?.msg
+        $.unblockUI();
+        const msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
           icon: 'error',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1
-        })
-      }
-    })
+          buttonsStyling: !1,
+        });
+      },
+    });
   }
 
   function handlerPay(token) {
     fpay(token, {
       onSuccess: function (data) {
-        paymentProcess(data)
+        paymentProcess(data);
       },
       onPending: function (data) {
         Swal.fire({
@@ -60,8 +60,8 @@ $(function () {
           text: data.msg,
           icon: 'info',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1
-        })
+          buttonsStyling: !1,
+        });
       },
       onError: function (data) {
         Swal.fire({
@@ -69,8 +69,8 @@ $(function () {
           text: data.msg,
           icon: 'info',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1
-        })
+          buttonsStyling: !1,
+        });
       },
       onClose: function () {
         Swal.fire({
@@ -78,67 +78,67 @@ $(function () {
           text: 'The payment window has closed!',
           icon: 'info',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1
-        })
-      }
-    })
+          buttonsStyling: !1,
+        });
+      },
+    });
   }
 
   function paymentProcess(res) {
     $.blockUI({
       message: elementLoader,
       css: { backgroundColor: 'transparent', border: '0' },
-      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-    })
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       data: {
         orderId: res.transaction.order_id,
-        paymentMethod: res.transaction.payment_method
+        paymentMethod: res.transaction.payment_method,
       },
       url: '/api/payment/process',
       type: 'POST',
       success: function (res) {
-        $.unblockUI()
+        $.unblockUI();
         Swal.fire({
           title: 'Good job!',
           text: 'Your payment has been successful 🎉',
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1
-        }).then(() => location.reload())
+          buttonsStyling: !1,
+        }).then(() => location.reload());
       },
       error: function (e) {
-        $.unblockUI()
-        const msg = e.responseJSON.msg
+        $.unblockUI();
+        const msg = e.responseJSON.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
           icon: 'error',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1
-        })
-      }
-    })
+          buttonsStyling: !1,
+        });
+      },
+    });
   }
 
   function loadHistory() {
-    $('table').block({
+    $('.card-billing').block({
       message: elementLoader,
       css: { backgroundColor: 'transparent', border: '0' },
-      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-    })
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
 
     $.get('?type=json', function (res) {
-      $('.listHistorys').html('')
-      $('table').unblock()
+      $('.listHistorys').html('');
+      $('.card-billing').unblock();
 
-      if (res.data?.length === 0) {
+      if (!res.data?.length) {
         $('.listHistorys').append(`<tr>
           <td class="text-center" colspan="5">There are no transactions at this time.</td>
-        </tr>`)
+        </tr>`);
       }
 
-      res.data.forEach(history => {
+      res.data.forEach((history) => {
         $('.listHistorys').append(`<tr>
           <td>${history.transactionId}</td>
           <td>${history.paymentMethod}</td>
@@ -147,14 +147,14 @@ $(function () {
           history.status
         }</span></td>
           <td>${toLocalDateString(history.createdAt)}</td>
-        </tr>`)
-      })
-    })
+        </tr>`);
+      });
+    });
   }
 
   function toLocalDateString(isoDateString, locale = 'default') {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    const date = new Date(isoDateString)
-    return date.toLocaleDateString(locale, options)
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(isoDateString);
+    return date.toLocaleDateString(locale, options);
   }
-})
+});

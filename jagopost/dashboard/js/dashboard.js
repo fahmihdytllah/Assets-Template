@@ -159,6 +159,14 @@ $(function () {
       $('.listPosts').show();
       $('.listPosts').html('');
 
+      if (!res.data?.length) {
+        $('.listPosts').append(`
+          <tr>
+            <td><span class="text-center text-muted">You don't have a post yet...</span></td>
+          </tr>
+        `);
+      }
+
       res.data.forEach((post) => {
         $('.listPosts').append(`
           <tr>
@@ -294,9 +302,14 @@ $(function () {
             },
           ],
         };
-      if (typeof campaignAverageChartE1 !== undefined && campaignAverageChartE1 !== null) {
-        const campaignAverageChart = new ApexCharts(campaignAverageChartE1, campaignAverageChartConfig);
-        campaignAverageChart.render();
+
+      if (!res.categoryData.length && !res.chartData?.length) {
+        $('#campaignAverageChart').html(`<span class="text-center text-muted">You don't have a post yet...</span>`);
+      } else {
+        if (typeof campaignAverageChartE1 !== undefined && campaignAverageChartE1 !== null) {
+          const campaignAverageChart = new ApexCharts(campaignAverageChartE1, campaignAverageChartConfig);
+          campaignAverageChart.render();
+        }
       }
     });
   }
@@ -459,9 +472,13 @@ $(function () {
       const campaignReportChartEl = document.querySelector('#campaignReportChart'),
         campaignReportChartConfig = CampaignReportsBarChart(res.chartData, res.categoryData, res.largesIndex);
 
-      if (typeof campaignReportChartEl !== undefined && campaignReportChartEl !== null) {
-        const campaignReportChart = new ApexCharts(campaignReportChartEl, campaignReportChartConfig);
-        campaignReportChart.render();
+      if (!res.largesIndex.length) {
+        $('#campaignReportChart').html(`<span class="text-center text-muted">You don't have a post yet...</span>`);
+      } else {
+        if (typeof campaignReportChartEl !== undefined && campaignReportChartEl !== null) {
+          const campaignReportChart = new ApexCharts(campaignReportChartEl, campaignReportChartConfig);
+          campaignReportChart.render();
+        }
       }
     });
   }
