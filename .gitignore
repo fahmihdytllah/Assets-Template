@@ -1,0 +1,7 @@
+# Apps
+node_modules
+package-lock.json
+
+# Editor Config
+.prettierrc.json
+.vscode/

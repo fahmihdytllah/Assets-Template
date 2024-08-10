@@ -1,0 +1,104 @@
+{
+  "pages": [
+    {
+      "name": "Dashboard",
+      "icon": "ti-smart-home",
+      "url": "/u"
+    },
+    {
+      "name": "Campaign",
+      "icon": "ti-api-app",
+      "url": "/u/campaign"
+    },
+    {
+      "name": "Platform",
+      "icon": "ti-hash",
+      "url": "/u/platform"
+    },
+    {
+      "name": "My Blog",
+      "icon": "ti-brand-blogger",
+      "url": "/u/b"
+    },
+    {
+      "name": "My Post",
+      "icon": "ti-list-details",
+      "url": "/u/b/posts"
+    },
+    {
+      "name": "New Post",
+      "icon": "ti-file-plus",
+      "url": "/u/b/posts/new"
+    },
+    {
+      "name": "Bing Indexer",
+      "icon": "ti-brand-bing",
+      "url": "/u/indexing/bing"
+    },
+    {
+      "name": "Google Indexer",
+      "icon": "ti-brand-google",
+      "url": "/u/indexing/google"
+    },
+    {
+      "name": "Yandex Indexer",
+      "icon": "ti-circle-letter-y",
+      "url": "/u/indexing/yandex"
+    },
+    {
+      "name": "Pinterest Post",
+      "icon": "ti-brand-pinterest",
+      "url": "/u/social/pinterest"
+    },
+    {
+      "name": "Facebook Post",
+      "icon": "ti-brand-facebook",
+      "url": "/u/social/facebook"
+    },
+    {
+      "name": "X / Twitter Post",
+      "icon": "ti-brand-twitter",
+      "url": "/u/social/twitter"
+    },
+    {
+      "name": "Linkedin Post",
+      "icon": "ti-brand-linkedin",
+      "url": "/u/social/linkedin"
+    },
+    {
+      "name": "AI Content",
+      "icon": "ti-robot",
+      "url": "/u/tool/ai-content"
+    },
+    {
+      "name": "Article Spinner",
+      "icon": "ti-fidget-spinner",
+      "url": "/u/tool/article-spinner"
+    },
+    {
+      "name": "Plagiarism Checker",
+      "icon": "ti-checklist",
+      "url": "/u/tool/plagiarism-checker"
+    },
+    {
+      "name": "Search Content",
+      "icon": "ti-list-search",
+      "url": "/u/tool/search-content"
+    },
+    {
+      "name": "Translate Content",
+      "icon": "ti-language",
+      "url": "/u/tool/translate-content"
+    },
+    {
+      "name": "Account Setting",
+      "icon": "ti-settings",
+      "url": "/u/account/setting"
+    },
+    {
+      "name": "Account Billing",
+      "icon": "ti-credit-card",
+      "url": "/u/account/billing"
+    }
+  ]
+}
