@@ -337,7 +337,7 @@ $(function () {
       }
 
       /** indexing */
-      if (localGraph.isLoggedBing) {
+      if (!localGraph.isLoggedBing) {
         $('.bingIndexer').prop('disabled', true);
       } else if (res.data?.isBingIndexer) {
         $('.bingIndexer').prop('disabled', false);
