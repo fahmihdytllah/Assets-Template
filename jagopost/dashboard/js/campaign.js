@@ -34,10 +34,12 @@ $(function () {
     $('#typeSearch').val(['articlecity']).trigger('change');
     $('#language').val('en').trigger('change');
     $('#timezone').val('Asia/Jakarta').trigger('change');
-    $('#displaySelectPage').hide();
-    $('#displaySelectBoard').hide();
     $('.translateContent').prop('disabled', false);
     $('.spinnerContent').prop('disabled', false);
+
+    $('#displaySelectPage').hide();
+    $('#displaySelectBoard').hide();
+    $('.aiMode').hide();
 
     $('.modalTitle').html('New Campaign');
     $('.modalDesc').html('Create a New Campaign auto post');
@@ -63,11 +65,14 @@ $(function () {
 
   $('.aiContent').change(function () {
     if ($(this).is(':checked')) {
+      $('.aiMode').show();
+
       $('.translateContent').prop('checked', false);
       $('.translateContent').prop('disabled', true);
       $('.spinnerContent').prop('checked', false);
       $('.spinnerContent').prop('disabled', true);
     } else {
+      $('.aiMode').hide();
       $('.translateContent').prop('disabled', false);
       $('.spinnerContent').prop('disabled', false);
     }
@@ -316,12 +321,16 @@ $(function () {
 
       if (res.data?.isAiContent) {
         $('.aiContent').prop('checked', true);
+        $('.aiMode').show();
+        $('input[name="aiMode"][value="' + res.data.aiMode + '"]').prop('checked', true);
+
         $('.translateContent').prop('checked', false);
         $('.translateContent').prop('disabled', true);
         $('.spinnerContent').prop('checked', false);
         $('.spinnerContent').prop('disabled', true);
       } else {
         $('.aiContent').prop('checked', false);
+        $('.aiMode').hide();
       }
 
       if (res.data?.isSpinnerContent) {
@@ -410,7 +419,7 @@ $(function () {
 
       setTimeout(function () {
         $('#modalCampaign').modal('show');
-      }, 800);
+      }, 200);
     });
   }
 
