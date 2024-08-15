@@ -27,6 +27,11 @@ $(function () {
     });
   }
 
+  $('#selectPlatforms').change(function () {
+    const platform = $(this).val();
+    changeBlog(platform);
+  });
+
   $('.new-campaign').click(function () {
     isModeAdd = true;
     formCampaign[0].reset();
@@ -160,15 +165,28 @@ $(function () {
     });
   });
 
+  function changeBlog(platform) {
+    $('.btn-create').prop('disabled', true);
+
+    $.get('/api/graphql?use=blog&platform=' + platform, function (res) {
+      $('.btn-create').prop('disabled', false);
+
+      $('#selectBlogs').html('');
+      res.listBlogs.forEach((blog) => {
+        $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
+      });
+    });
+  }
+
   function loadDataGrapgh() {
-    $.get('/api/graphql?use=social,blogger,indexer', function (res) {
+    $.get('/api/graphql?use=social,blog,indexer', function (res) {
       localGraph = res;
       isGraphLoaded = true;
 
       if (res.isLoggedGoogle) {
         $('#selectBlogs').html('');
         res.listBlogs.forEach((blog) => {
-          $('#selectBlogs').append(`<option value="${blog.id}">${blog.name}</option>`);
+          $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
         });
 
         $('.googleIndexer').prop('disabled', false);
@@ -248,15 +266,20 @@ $(function () {
         res.data.forEach((camp) => {
           const schedule =
             camp.days.length == '7'
-              ? 'Repeat every day.'
+              ? 'Repeat every day'
               : camp.days.length == '6' && camp.days.includes('Sun')
-              ? 'Repeats every Monday to Friday.'
-              : `Repeats every ${camp.days.join(', ')}.`;
+              ? 'Repeats every Monday to Friday'
+              : `Repeats every ${camp.days.join(', ')}`;
+
+          let keywords = '';
+          camp.keywords.forEach((keyword) => {
+            keywords += '<span class="badge rounded-pill me-1 mb-1 bg-label-dark fw-medium">' + keyword + '</span>';
+          });
 
           $('#listCampaigns').append(`<div class="col-md-6" id="${camp._id}">
             <div class="bg-lighter rounded p-3 mb-3 position-relative">
               <div class="dropdown api-key-actions">
-                <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
+                <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-settings ti-sm"></i></a>
                 <div class="dropdown-menu dropdown-menu-end">
                   <button class="dropdown-item edit-campaign" data-id="${camp._id}" ${
             isGraphLoaded ? '' : 'disabled'
@@ -268,13 +291,13 @@ $(function () {
               </div>
               <div class="d-flex align-items-center mb-3">
                 <h4 class="mb-0 me-3">${camp.name}</h4>
-                <span class="badge bg-label-${camp.isActive ? 'success' : 'danger'}">${
+                <span class="badge bg-label-${camp.isActive ? 'success' : 'danger'} me-2">${
             camp.isActive ? 'ACTIVE' : 'NON ACTIVE'
           }</span>
+                <span class="badge bg-label-primary">${camp.platform.toUpperCase()}</span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <span class="badge bg-label-info rounded-pill me-2">Keywords:</span>
-                <p class="me-2 mb-0 fw-medium">${camp.keywords.join(', ')}</p>
+              <div class="mb-2">
+                ${keywords}
               </div>
               <span class="text-muted">${schedule}</span>
             </div>
@@ -298,6 +321,7 @@ $(function () {
       $('#selectBlogs').val(res.data?.blogId).trigger('change');
       $('#typeSearch').val(res.data?.typeSearch).trigger('change');
       $('#language').val(res.data?.language).trigger('change');
+      $('#selectPlatforms').val(res.data?.platform).trigger('change');
 
       keywords.removeAllTags();
       keywords.addTags(res.data?.keywords);

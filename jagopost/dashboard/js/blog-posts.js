@@ -6,22 +6,22 @@ $(function () {
     formSelectIndexer = $('#formSelectIndexer'),
     formSelectSocial = $('#formSelectSocial'),
     isModalSocialShow = false,
-    dataPosts
+    dataPosts;
 
   if (select2.length) {
     select2.each(function () {
-      var $this = $(this)
+      var $this = $(this);
       $this.wrap('<div class="position-relative"></div>').select2({
         placeholder: 'Select value',
-        dropdownParent: $this.parent()
-      })
-    })
+        dropdownParent: $this.parent(),
+      });
+    });
   }
 
   $('#myBlog').on('change', function (e) {
-    blogID = $(this).val()
-    dataPosts.ajax.url(`?type=json&id=${blogID}`).load()
-  })
+    blogID = $(this).val();
+    dataPosts.ajax.url(`?type=json&id=${blogID}`).load();
+  });
 
   if (dataPostsTable.length) {
     dataPosts = dataPostsTable.DataTable({
@@ -32,12 +32,12 @@ $(function () {
           $('.card').block({
             message: elementLoader,
             css: { backgroundColor: 'transparent', border: '0' },
-            overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-          })
+            overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+          });
         },
         complete: function () {
-          $('.card').unblock()
-        }
+          $('.card').unblock();
+        },
       },
       columns: [
         { data: 'id' },
@@ -47,7 +47,7 @@ $(function () {
         { data: 'labels' },
         { data: 'comments' },
         { data: 'updated' },
-        { data: 'url' }
+        { data: 'url' },
       ],
       columnDefs: [
         {
@@ -58,8 +58,8 @@ $(function () {
           responsivePriority: 2,
           targets: 0,
           render: function (data, type, full, meta) {
-            return ''
-          }
+            return '';
+          },
         },
         {
           targets: 1,
@@ -69,8 +69,8 @@ $(function () {
           checkboxes: true,
           checkboxes: { selectAllRender: '<input type="checkbox" class="form-check-input">' },
           render: function (data, type, full, meta) {
-            return `<input type="checkbox" class="dt-checkboxes form-check-input" data-id="${full['id']}" data-url="${full['url']}">`
-          }
+            return `<input type="checkbox" class="dt-checkboxes form-check-input" data-id="${full['id']}" data-url="${full['url']}">`;
+          },
         },
         {
           targets: 2,
@@ -79,23 +79,23 @@ $(function () {
             return `<div class="d-flex justify-content-start align-items-center">
               <img src="${full.thumbnail}" alt="${full.title}" class="rounded me-2 w-px-50" />
               ${full.title}
-            </div>`
-          }
+            </div>`;
+          },
         },
         {
           // Label
           targets: -4,
           render: function (data, type, full, meta) {
-            const labels = typeof full['labels'] != 'undefined' ? full['labels'].join(', ') : '-'
+            const labels = typeof full['labels'] != 'undefined' ? full['labels'].join(', ') : '-';
             // return '<span class="badge rounded-pills bg-label-primary">' + labelPost + '</span>'
-            return labels
-          }
+            return labels;
+          },
         },
         {
           targets: -3,
           render: function (data, type, full, meta) {
-            return '<span class="badge bg-label-info">' + full.comments + '</span>'
-          }
+            return '<span class="badge bg-label-info">' + full.comments + '</span>';
+          },
         },
         {
           targets: -1,
@@ -103,6 +103,9 @@ $(function () {
           orderable: false,
           searchable: false,
           render: function (data, type, full, meta) {
+            const url =
+              full.blogId === 'wp' ? '/u/w/posts/' + full['id'] : '/u/b/posts/' + full.blogId + '/' + full['id'];
+
             return `<div class="d-inline-block">
               <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                 <i class="text-primary ti ti-dots-vertical"></i>
@@ -110,16 +113,16 @@ $(function () {
               <ul class="dropdown-menu dropdown-menu-end m-0">
                 <li><a href="${full['url']}" target="_blank" class="dropdown-item"><i class="ti-xs ti ti-eye me-1"></i>Show</a></li>
                 <div class="dropdown-divider"></div>
-                <li><a href="javascript:;" data-blog="${full.blogId}" data-id="${full['id']}" class="dropdown-item text-danger delete-post"><i class="ti-xs ti ti-trash me-1"></i>Delete</a></li>
+                <li><button data-blog="${full.blogId}" data-id="${full['id']}" class="dropdown-item text-danger delete-post"><i class="ti-xs ti ti-trash me-1"></i>Delete</button></li>
               </ul>
             </div>
-            <a href="/u/b/posts/${full.blogId}/${full['id']}" target="_blank" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>`
-          }
-        }
+            <a href="${url}" target="_blank" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>`;
+          },
+        },
       ],
       dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-      displayLength: 7,
-      lengthMenu: [7, 10, 25, 50, 75, 100],
+      displayLength: 10,
+      lengthMenu: [10, 25, 50, 75, 100],
       buttons: [
         {
           extend: 'collection',
@@ -138,15 +141,15 @@ $(function () {
                   confirmButtonText: 'Yes, rewrite it!',
                   customClass: {
                     confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-                    cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+                    cancelButton: 'btn btn-label-secondary waves-effect waves-light',
                   },
-                  buttonsStyling: false
+                  buttonsStyling: false,
                 }).then(function (result) {
                   if (result.value) {
-                    $('#modalSelectLanguage').modal('show')
+                    $('#modalSelectLanguage').modal('show');
                   }
-                })
-              }
+                });
+              },
             },
             {
               text: '<i class="ti ti-share me-1" ></i>Share Post',
@@ -160,20 +163,20 @@ $(function () {
                   confirmButtonText: 'Yes, share it!',
                   customClass: {
                     confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-                    cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+                    cancelButton: 'btn btn-label-secondary waves-effect waves-light',
                   },
-                  buttonsStyling: false
+                  buttonsStyling: false,
                 }).then(function (result) {
                   if (result.value) {
                     if (isModalSocialShow) {
-                      $('#modalSelectSocial').modal('show')
+                      $('#modalSelectSocial').modal('show');
                     } else {
-                      isModalSocialShow = true
-                      loadDataSocial()
+                      isModalSocialShow = true;
+                      loadDataSocial();
                     }
                   }
-                })
-              }
+                });
+              },
             },
             {
               text: '<i class="ti ti-world-search me-1" ></i>Index Post',
@@ -187,15 +190,15 @@ $(function () {
                   confirmButtonText: 'Yes, index it!',
                   customClass: {
                     confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-                    cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+                    cancelButton: 'btn btn-label-secondary waves-effect waves-light',
                   },
-                  buttonsStyling: false
+                  buttonsStyling: false,
                 }).then(function (result) {
                   if (result.value) {
-                    $('#modalSelectIndexer').modal('show')
+                    $('#modalSelectIndexer').modal('show');
                   }
-                })
-              }
+                });
+              },
             },
             {
               text: '<i class="ti ti-trash me-1"></i>Delete Post',
@@ -209,33 +212,34 @@ $(function () {
                   confirmButtonText: 'Yes, delete it!',
                   customClass: {
                     confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-                    cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+                    cancelButton: 'btn btn-label-secondary waves-effect waves-light',
                   },
-                  buttonsStyling: false
+                  buttonsStyling: false,
                 }).then(function (result) {
                   if (result.value) {
-                    bulkActionPost('delete')
+                    bulkActionPost('delete');
                   }
-                })
-              }
-            }
-          ]
+                });
+              },
+            },
+          ],
         },
         {
           text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add New Post</span>',
           className: 'create-new btn btn-primary waves-effect waves-light',
           action: function () {
-            window.location = '/u/b/posts/new?id=' + blogID
-          }
-        }
+            const url = blogID === 'wp' ? '/u/w/posts/new' : '/u/b/posts/new?id=' + blogID;
+            window.location = url;
+          },
+        },
       ],
       responsive: {
         details: {
           display: $.fn.dataTable.Responsive.display.modal({
             header: function (row) {
-              var data = row.data()
-              return 'My post details'
-            }
+              var data = row.data();
+              return 'My post details';
+            },
           }),
           type: 'column',
           renderer: function (api, rowIdx, columns) {
@@ -254,36 +258,36 @@ $(function () {
                     col.data +
                     '</td>' +
                     '</tr>'
-                : ''
-            }).join('')
+                : '';
+            }).join('');
 
-            return data ? $('<table class="table"/><tbody />').append(data) : false
-          }
-        }
-      }
-    })
-    $('div.head-label').html('<h5 class="card-title mb-0">My Posts</h5>')
+            return data ? $('<table class="table"/><tbody />').append(data) : false;
+          },
+        },
+      },
+    });
+    $('div.head-label').html('<h5 class="card-title mb-0">My Posts</h5>');
   }
 
   formSelectLanguage.submit(function (e) {
-    e.preventDefault()
+    e.preventDefault();
     bulkActionPost('ai', {
-      lang: $('#lang').val()
-    })
-  })
+      lang: $('#lang').val(),
+    });
+  });
 
   formSelectIndexer.submit(function (e) {
-    e.preventDefault()
+    e.preventDefault();
     bulkActionPost('index', {
       bingIndexer: $('.bingIndexer').is(':checked') ? true : false,
       googleIndexer: $('.googleIndexer').is(':checked') ? true : false,
-      yandexIndexer: $('.yandexIndexer').is(':checked') ? true : false
-    })
-  })
+      yandexIndexer: $('.yandexIndexer').is(':checked') ? true : false,
+    });
+  });
 
   formSelectSocial.submit(function (e) {
-    e.preventDefault()
-    let FBPage = $('#selectPage').val().split('[]')
+    e.preventDefault();
+    let FBPage = $('#selectPage').val().split('[]');
     bulkActionPost('share', {
       pinterestShare: $('.pinterestShare').is(':checked') ? true : false,
       facebookShare: $('.facebookShare').is(':checked') ? true : false,
@@ -291,14 +295,15 @@ $(function () {
       linkedinShare: $('.linkedinShare').is(':checked') ? true : false,
       boardId: $('#selectBoard').val(),
       pageId: FBPage[0],
-      pageToken: FBPage[1]
-    })
-  })
+      pageToken: FBPage[1],
+    });
+  });
 
   // Delete Post
   $('.datatables-basic tbody').on('click', '.delete-post', function () {
-    const $this = $(this)
-    const postID = $this.data('id')
+    const $this = $(this);
+    const postID = $this.data('id');
+    const url = blogID === 'wp' ? 'posts/' + postID : 'posts/' + blogID + '/' + postID;
 
     Swal.fire({
       title: 'Are you sure?',
@@ -308,109 +313,110 @@ $(function () {
       confirmButtonText: 'Yes, delete it!',
       customClass: {
         confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-        cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
       },
-      buttonsStyling: false
+      buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
         $.blockUI({
           message: elementLoader,
           css: { backgroundColor: 'transparent', border: '0' },
-          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-        })
+          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+        });
+
         $.ajax({
-          url: `/u/b/posts/${blogID}/${postID}`,
+          url,
           type: 'DELETE',
           success: function (d) {
-            $.unblockUI()
-            dataPosts.row($this.parents('tr')).remove().draw()
+            $.unblockUI();
+            dataPosts.row($this.parents('tr')).remove().draw();
             Swal.fire({
               title: 'Good job!',
               text: d.msg,
               icon: 'success',
-              customClass: { confirmButton: 'btn btn-success waves-effect waves-light' }
-            })
+              customClass: { confirmButton: 'btn btn-success waves-effect waves-light' },
+            });
           },
           error: function (e) {
-            $.unblockUI()
-            const msg = e.responseJSON.msg
+            $.unblockUI();
+            const msg = e.responseJSON.msg;
             Swal.fire({
               title: 'Upss!',
               text: msg ? msg : 'There is an error!',
               icon: 'error',
-              customClass: { confirmButton: 'btn btn-primary' }
-            })
-          }
-        })
+              customClass: { confirmButton: 'btn btn-primary' },
+            });
+          },
+        });
       }
-    })
-  })
+    });
+  });
 
   $('.pinterestShare').change(function () {
     if ($(this).is(':checked')) {
-      $('#displaySelectBoard').show()
+      $('#displaySelectBoard').show();
     } else {
-      $('#displaySelectBoard').hide()
+      $('#displaySelectBoard').hide();
     }
-  })
+  });
 
   $('.facebookShare').change(function () {
     if ($(this).is(':checked')) {
-      $('#displaySelectPage').show()
+      $('#displaySelectPage').show();
     } else {
-      $('#displaySelectPage').hide()
+      $('#displaySelectPage').hide();
     }
-  })
+  });
 
   function loadDataSocial() {
     $.get('/api/graphql?use=social', function (res) {
       if (res.isLoggedPinterest) {
-        $('#selectBoard').html('')
-        res.listBoards.forEach(board => {
-          $('#selectBoard').append(`<option value="${board.id}">${board.name}</option>`)
-        })
+        $('#selectBoard').html('');
+        res.listBoards.forEach((board) => {
+          $('#selectBoard').append(`<option value="${board.id}">${board.name}</option>`);
+        });
 
-        $('.pinterestShare').prop('disabled', false)
+        $('.pinterestShare').prop('disabled', false);
       } else {
-        $('.pinterestShare').prop('disabled', true)
-        $('#displaySelectBoard').hide()
+        $('.pinterestShare').prop('disabled', true);
+        $('#displaySelectBoard').hide();
       }
 
       if (res.isLoggedFacebook) {
-        $('#selectPage').html('')
-        res.listPages.forEach(page => {
-          $('#selectPage').append(`<option value="${page.id}[]${page.access_token}">${page.name}</option>`)
-        })
+        $('#selectPage').html('');
+        res.listPages.forEach((page) => {
+          $('#selectPage').append(`<option value="${page.id}[]${page.access_token}">${page.name}</option>`);
+        });
 
-        $('.facebookShare').prop('disabled', false)
+        $('.facebookShare').prop('disabled', false);
       } else {
-        $('.facebookShare').prop('disabled', true)
-        $('#displaySelectPage').hide()
+        $('.facebookShare').prop('disabled', true);
+        $('#displaySelectPage').hide();
       }
 
       if (res.isLoggedTwitter) {
-        $('.twitterShare').prop('disabled', false)
+        $('.twitterShare').prop('disabled', false);
       } else {
-        $('.twitterShare').prop('disabled', true)
+        $('.twitterShare').prop('disabled', true);
       }
 
       if (res.isLoggedLinkedin) {
-        $('.linkedinShare').prop('disabled', false)
+        $('.linkedinShare').prop('disabled', false);
       } else {
-        $('.linkedinShare').prop('disabled', true)
+        $('.linkedinShare').prop('disabled', true);
       }
 
-      $('#modalSelectSocial').modal('show')
-    })
+      $('#modalSelectSocial').modal('show');
+    });
   }
 
   function bulkActionPost(selectedType, data = {}) {
     let listPost = $('input.dt-checkboxes[type=checkbox]:checkbox:checked'),
-      _dataPosts = []
+      _dataPosts = [];
 
     listPost.each(function () {
-      _dataPosts.push({ postID: $(this).data('id'), url: $(this).data('url') })
-    })
+      _dataPosts.push({ postID: $(this).data('id'), url: $(this).data('url') });
+    });
 
     if (_dataPosts.length <= 0) {
       Swal.fire({
@@ -418,14 +424,14 @@ $(function () {
         text: 'Please select a post first!',
         icon: 'error',
         customClass: { confirmButton: 'btn btn-primary' },
-        buttonsStyling: !1
-      })
+        buttonsStyling: !1,
+      });
     } else {
       $.blockUI({
         message: elementLoader,
         css: { backgroundColor: 'transparent', border: '0' },
-        overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-      })
+        overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+      });
 
       $.ajax({
         type: 'POST',
@@ -433,43 +439,43 @@ $(function () {
         contentType: 'application/json',
         data: JSON.stringify({
           ...{ blogID, type: selectedType, dataPosts: _dataPosts },
-          ...data
+          ...data,
         }),
         success: function (d) {
-          $.unblockUI()
-          $('#modalSelectLanguage').modal('hide')
+          $.unblockUI();
+          $('#modalSelectLanguage').modal('hide');
 
           Swal.fire({
             title: 'Good job!',
             text: d.msg,
             icon: 'success',
             customClass: { confirmButton: 'btn btn-primary' },
-            buttonsStyling: !1
+            buttonsStyling: !1,
           }).then(() => {
             if (selectedType === 'delete' || selectedType === 'ai') {
-              dataPosts.ajax.reload()
+              dataPosts.ajax.reload();
             }
-          })
+          });
         },
         error: function (e) {
-          $.unblockUI()
-          const msg = e.responseJSON.msg
+          $.unblockUI();
+          const msg = e.responseJSON.msg;
           Swal.fire({
             title: 'Upss!',
             text: msg ? msg : 'There is an error!',
             icon: 'error',
             customClass: { confirmButton: 'btn btn-primary' },
-            buttonsStyling: !1
-          })
-        }
-      })
+            buttonsStyling: !1,
+          });
+        },
+      });
     }
   }
 
   // Filter form control to default size
   // ? setTimeout used for multilingual table initialization
   setTimeout(() => {
-    $('.dataTables_filter .form-control').removeClass('form-control-sm')
-    $('.dataTables_length .form-select').removeClass('form-select-sm')
-  }, 300)
-})
+    $('.dataTables_filter .form-control').removeClass('form-control-sm');
+    $('.dataTables_length .form-select').removeClass('form-select-sm');
+  }, 300);
+});
