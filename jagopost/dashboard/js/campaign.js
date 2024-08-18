@@ -3,6 +3,7 @@ $(function () {
     formCampaign = $('#formCampaign'),
     loader = $('.loader'),
     localGraph = {},
+    listBlogs = {},
     keywords = null,
     isModeAdd = true,
     isGraphLoaded = false,
@@ -45,6 +46,8 @@ $(function () {
     $('#displaySelectPage').hide();
     $('#displaySelectBoard').hide();
     $('.aiMode').hide();
+    $('.cronSyntax').hide();
+    $('.cronManual').show();
 
     $('.modalTitle').html('New Campaign');
     $('.modalDesc').html('Create a New Campaign auto post');
@@ -65,6 +68,16 @@ $(function () {
       $('#displaySelectPage').show();
     } else {
       $('#displaySelectPage').hide();
+    }
+  });
+
+  $('.cronTime').change(function () {
+    if ($(this).is(':checked')) {
+      $('.cronSyntax').show();
+      $('.cronManual').hide();
+    } else {
+      $('.cronManual').show();
+      $('.cronSyntax').hide();
     }
   });
 
@@ -166,15 +179,9 @@ $(function () {
   });
 
   function changeBlog(platform) {
-    $('.btn-create').prop('disabled', true);
-
-    $.get('/api/graphql?use=blog&platform=' + platform, function (res) {
-      $('.btn-create').prop('disabled', false);
-
-      $('#selectBlogs').html('');
-      res.listBlogs.forEach((blog) => {
-        $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
-      });
+    $('#selectBlogs').html('');
+    listBlogs[platform].forEach((blog) => {
+      $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
     });
   }
 
@@ -182,10 +189,11 @@ $(function () {
     $.get('/api/graphql?use=social,blog,indexer', function (res) {
       localGraph = res;
       isGraphLoaded = true;
+      listBlogs = res.listBlogs;
 
       if (res.isLoggedGoogle) {
         $('#selectBlogs').html('');
-        res.listBlogs.forEach((blog) => {
+        listBlogs[res.platform].forEach((blog) => {
           $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
         });
 
@@ -341,6 +349,17 @@ $(function () {
         $('.autoPost').prop('checked', true);
       } else {
         $('.autoPost').prop('checked', false);
+      }
+
+      if (res.data?.isCronSyntax) {
+        $('#cronSyntax').val(res.data.cronSyntax);
+        $('.cronTime').prop('checked', true);
+        $('.cronSyntax').show();
+        $('.cronManual').hide();
+      } else {
+        $('.cronTime').prop('checked', false);
+        $('.cronSyntax').hide();
+        $('.cronManual').show();
       }
 
       if (res.data?.isAiContent) {

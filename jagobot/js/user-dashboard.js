@@ -23,9 +23,30 @@ $(document).ready(function () {
     borderColor = config.colors.borderColor;
   }
 
+  // Chart Colors
+  const chartColors = {
+    donut: {
+      series1: '#ce9ffc',
+      series2: '#7367f0',
+      series3: '#362d92',
+      series4: '#8f85f3',
+    },
+    bar: {
+      series1: config.colors.primary,
+      series2: '#7367F0CC',
+      series3: '#7367f099',
+    },
+  };
+
   // load data analystic
   loadStatistik();
   loadEarningReportYearly();
+
+  /** Load Earning Platform */
+  loadChartPlatform();
+
+  /** Load Earning Country */
+  loadChartCountry();
 
   $('.btn-refresh').click(function () {
     loadEarningReportYearly();
@@ -205,14 +226,22 @@ $(document).ready(function () {
           </div>`);
 
         const earningReportYearlyEl = document.querySelector('#earningReportYearly'),
-          earningReportYearlyConfig = EarningReportsBarChart(d.reportThisYear.chartData, d.reportThisYear.categoryData, d.reportThisYear.activeIndex);
+          earningReportYearlyConfig = EarningReportsBarChart(
+            d.reportThisYear.chartData,
+            d.reportThisYear.categoryData,
+            d.reportThisYear.activeIndex
+          );
         if (typeof earningReportYearlyEl !== undefined && earningReportYearlyEl !== null) {
           const earningReportYearly = new ApexCharts(earningReportYearlyEl, earningReportYearlyConfig);
           earningReportYearly.render();
         }
 
         const earningReportMonthlyEl = document.querySelector('#earningReportMonthly'),
-          earningReportMonthlyConfig = EarningReportsBarChart(d.reportThisMonth.chartData, d.reportThisMonth.categoryData, d.reportThisMonth.activeIndex);
+          earningReportMonthlyConfig = EarningReportsBarChart(
+            d.reportThisMonth.chartData,
+            d.reportThisMonth.categoryData,
+            d.reportThisMonth.activeIndex
+          );
         if (typeof earningReportMonthlyEl !== undefined && earningReportMonthlyEl !== null) {
           const earningReportMonthly = new ApexCharts(earningReportMonthlyEl, earningReportMonthlyConfig);
           earningReportMonthly.render();
@@ -222,12 +251,12 @@ $(document).ready(function () {
           <div class="pt-1">
             <span class="badge bg-label-secondary">-</span>
           </div>`);
-          
+
         $('.incomeThisMonth').html(`<p class="mb-2 mt-1">-</p>
           <div class="pt-1">
             <span class="badge bg-label-secondary">-</span>
           </div>`);
-          
+
         $('#earningReportYearly').html('<span class="text-muted">Please log in to your Adsense account first.<span>');
         $('#earningReportMonthly').html('<span class="text-muted">Please log in to your Adsense account first.<span>');
       }
@@ -286,6 +315,260 @@ $(document).ready(function () {
           </div>
         </div>
       </div>`);
+    });
+  }
+
+  function loadChartPlatform() {
+    $('.loaderPlatformChart').loaderShow();
+    $('#earningPlatformChart').hide();
+
+    $.get('/api/dashboard?type=platform', function ({ labels, series }) {
+      $('.loaderPlatformChart').loaderHide();
+      $('#earningPlatformChart').show();
+      $('#earningPlatformChart').html('');
+
+      const earningPlatformChartE1 = document.querySelector('#earningPlatformChart'),
+        total = series.reduce((accumulator, currentValue) => accumulator + currentValue, 0),
+        earningPlatformChartConfig = {
+          chart: {
+            height: 400,
+            parentHeightOffset: 0,
+            type: 'donut',
+          },
+          labels,
+          series,
+          colors: [
+            chartColors.donut.series1,
+            chartColors.donut.series2,
+            chartColors.donut.series3,
+            chartColors.donut.series4,
+          ],
+          stroke: {
+            width: 0,
+          },
+          dataLabels: {
+            enabled: false,
+            formatter: function (val, opt) {
+              return ((val / total) * 100).toFixed(1) + '%';
+            },
+          },
+          legend: {
+            show: true,
+            position: 'bottom',
+            offsetY: 10,
+            markers: {
+              width: 8,
+              height: 8,
+              offsetX: -3,
+            },
+            itemMargin: {
+              horizontal: 15,
+              vertical: 5,
+            },
+            fontSize: '13px',
+            fontFamily: 'Public Sans',
+            fontWeight: 400,
+            labels: {
+              colors: headingColor,
+              useSeriesColors: false,
+            },
+          },
+          tooltip: {
+            y: {
+              formatter: function (val) {
+                return formatNumber(val);
+              },
+            },
+          },
+          grid: {
+            padding: {
+              top: 15,
+            },
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: '75%',
+                labels: {
+                  show: true,
+                  value: {
+                    fontSize: '26px',
+                    fontFamily: 'Public Sans',
+                    color: headingColor,
+                    fontWeight: 500,
+                    offsetY: -30,
+                    formatter: function (val) {
+                      return ((val / total) * 100).toFixed(0) + '%';
+                    },
+                  },
+                  name: {
+                    offsetY: 20,
+                    fontFamily: 'Public Sans',
+                  },
+                  total: {
+                    show: true,
+                    fontSize: '0.9rem',
+                    label: labels[0],
+                    color: labelColor,
+                    formatter: function (w) {
+                      return ((series[0] / total) * 100).toFixed(0) + '%';
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 1025,
+              options: {
+                chart: {
+                  height: 380,
+                },
+              },
+            },
+            {
+              breakpoint: 420,
+              options: {
+                chart: {
+                  height: 300,
+                },
+              },
+            },
+          ],
+        };
+
+      if (typeof earningPlatformChartE1 !== undefined && earningPlatformChartE1 !== null) {
+        const earningPlatformChart = new ApexCharts(earningPlatformChartE1, earningPlatformChartConfig);
+        earningPlatformChart.render();
+      }
+    });
+  }
+
+  function loadChartCountry() {
+    $('.loaderCountryChart').loaderShow();
+    $('#earningCountryChart').hide();
+
+    $.get('/api/dashboard?type=country', function ({ labels, series }) {
+      $('.loaderCountryChart').loaderHide();
+      $('#earningCountryChart').show();
+      $('#earningCountryChart').html('');
+
+      const earningCountryChartE1 = document.querySelector('#earningCountryChart'),
+        total = series.reduce((accumulator, currentValue) => accumulator + currentValue, 0),
+        earningCountryChartConfig = {
+          chart: {
+            height: 400,
+            parentHeightOffset: 0,
+            type: 'donut',
+          },
+          labels,
+          series,
+          colors: [
+            chartColors.donut.series1,
+            chartColors.donut.series2,
+            chartColors.donut.series3,
+            chartColors.donut.series4,
+          ],
+          stroke: {
+            width: 0,
+          },
+          dataLabels: {
+            enabled: false,
+            formatter: function (val, opt) {
+              return ((val / total) * 100).toFixed(1) + '%';
+            },
+          },
+          legend: {
+            show: true,
+            position: 'bottom',
+            offsetY: 10,
+            markers: {
+              width: 8,
+              height: 8,
+              offsetX: -3,
+            },
+            itemMargin: {
+              horizontal: 15,
+              vertical: 5,
+            },
+            fontSize: '13px',
+            fontFamily: 'Public Sans',
+            fontWeight: 400,
+            labels: {
+              colors: headingColor,
+              useSeriesColors: false,
+            },
+          },
+          tooltip: {
+            y: {
+              formatter: function (val) {
+                return formatNumber(val);
+              },
+            },
+          },
+          grid: {
+            padding: {
+              top: 15,
+            },
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: '75%',
+                labels: {
+                  show: true,
+                  value: {
+                    fontSize: '26px',
+                    fontFamily: 'Public Sans',
+                    color: headingColor,
+                    fontWeight: 500,
+                    offsetY: -30,
+                    formatter: function (val) {
+                      return ((val / total) * 100).toFixed(0) + '%';
+                    },
+                  },
+                  name: {
+                    offsetY: 20,
+                    fontFamily: 'Public Sans',
+                  },
+                  total: {
+                    show: true,
+                    fontSize: '0.9rem',
+                    label: labels[0],
+                    color: labelColor,
+                    formatter: function (w) {
+                      return ((series[0] / total) * 100).toFixed(0) + '%';
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 1025,
+              options: {
+                chart: {
+                  height: 380,
+                },
+              },
+            },
+            {
+              breakpoint: 420,
+              options: {
+                chart: {
+                  height: 300,
+                },
+              },
+            },
+          ],
+        };
+
+      if (typeof earningCountryChartE1 !== undefined && earningCountryChartE1 !== null) {
+        const earningCountryChart = new ApexCharts(earningCountryChartE1, earningCountryChartConfig);
+        earningCountryChart.render();
+      }
     });
   }
 
