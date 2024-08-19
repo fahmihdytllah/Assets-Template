@@ -89,6 +89,12 @@ $(document).ready(function () {
         {
           targets: 3,
           render: function (data, type, full, meta) {
+            return `<span class="badge rounded-pill bg-label-primary me-1">${full.userId?.name}</span>`;
+          },
+        },
+        {
+          targets: 4,
+          render: function (data, type, full, meta) {
             return `<span class="badge rounded-pill bg-label-info me-1">${full.keyId?.name}</span>`;
           },
         },
