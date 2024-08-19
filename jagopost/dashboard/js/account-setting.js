@@ -2,7 +2,7 @@
  * Account Settings - Account
  */
 
-'use strict'
+'use strict';
 
 // Inisialisasi Firebase
 const firebaseConfig = {
@@ -12,20 +12,20 @@ const firebaseConfig = {
   storageBucket: 'jago-code.appspot.com',
   messagingSenderId: '733341114140',
   appId: '1:733341114140:web:aee7d8fd24e979e9bba4d9',
-  measurementId: 'G-4CDRVEBPJD'
-}
+  measurementId: 'G-4CDRVEBPJD',
+};
 
-firebase.initializeApp(firebaseConfig)
+firebase.initializeApp(firebaseConfig);
 
 // Referensi ke Firebase Storage
-const storage = firebase.storage()
+const storage = firebase.storage();
 
 document.addEventListener('DOMContentLoaded', function (e) {
-  ;(function () {
+  (function () {
     const formAccSettings = document.querySelector('#formAccountSettings'),
       formChangePass = document.querySelector('#formChangePassword'),
       deactivateAcc = document.querySelector('#formAccountDeactivation'),
-      deactivateButton = deactivateAcc.querySelector('.deactivate-account')
+      deactivateButton = deactivateAcc.querySelector('.deactivate-account');
 
     // Form validation for setting account
     if (formAccSettings) {
@@ -34,21 +34,21 @@ document.addEventListener('DOMContentLoaded', function (e) {
           name: {
             validators: {
               notEmpty: {
-                message: 'Please enter first name'
-              }
-            }
+                message: 'Please enter first name',
+              },
+            },
           },
           username: {
             validators: {
               notEmpty: {
-                message: 'Please enter username'
+                message: 'Please enter username',
               },
               stringLength: {
                 min: 6,
-                message: 'Username must be more than 6 characters'
-              }
-            }
-          }
+                message: 'Username must be more than 6 characters',
+              },
+            },
+          },
           // number: {
           //   validators: {
           //     notEmpty: {
@@ -65,58 +65,58 @@ document.addEventListener('DOMContentLoaded', function (e) {
           trigger: new FormValidation.plugins.Trigger(),
           bootstrap5: new FormValidation.plugins.Bootstrap5({
             eleValidClass: '',
-            rowSelector: '.col-md-6'
+            rowSelector: '.col-md-6',
           }),
-          submitButton: new FormValidation.plugins.SubmitButton()
+          submitButton: new FormValidation.plugins.SubmitButton(),
           // Submit the form when all fields are valid
           // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
         },
-        init: instance => {
+        init: (instance) => {
           instance.on('plugins.message.placed', function (e) {
             if (e.element.parentElement.classList.contains('input-group')) {
-              e.element.parentElement.insertAdjacentElement('afterend', e.messageElement)
+              e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
             }
-          })
-        }
-      })
+          });
+        },
+      });
 
-      const formSetting = $('#formAccountSettings')
+      const formSetting = $('#formAccountSettings');
       fv.on('core.form.valid', function () {
         formSetting.block({
           message: elementLoader,
           css: { backgroundColor: 'transparent', border: '0' },
-          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-        })
+          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+        });
 
         $.ajax({
           type: 'POST',
           url: '?type=updateAccount',
           data: $(formSetting).serialize(),
           success: function (res) {
-            formSetting.unblock()
+            formSetting.unblock();
             Swal.fire({
               icon: 'success',
               title: 'Good Job!',
               text: res.msg,
               customClass: {
-                confirmButton: 'btn btn-success waves-effect waves-light'
-              }
-            })
+                confirmButton: 'btn btn-success waves-effect waves-light',
+              },
+            });
           },
           error: function (error) {
-            formSetting.unblock()
-            const msg = error.responseJSON?.msg
+            formSetting.unblock();
+            const msg = error.responseJSON?.msg;
             Swal.fire({
               icon: 'error',
               title: 'Opps!',
               text: msg,
               customClass: {
-                confirmButton: 'btn btn-danger waves-effect waves-light'
-              }
-            })
-          }
-        })
-      })
+                confirmButton: 'btn btn-danger waves-effect waves-light',
+              },
+            });
+          },
+        });
+      });
     }
 
     // Form validation for Change password
@@ -126,99 +126,99 @@ document.addEventListener('DOMContentLoaded', function (e) {
           currentPassword: {
             validators: {
               notEmpty: {
-                message: 'Please current password'
+                message: 'Please current password',
               },
               stringLength: {
                 min: 8,
-                message: 'Password must be more than 8 characters'
-              }
-            }
+                message: 'Password must be more than 8 characters',
+              },
+            },
           },
           newPassword: {
             validators: {
               notEmpty: {
-                message: 'Please enter new password'
+                message: 'Please enter new password',
               },
               stringLength: {
                 min: 8,
-                message: 'Password must be more than 8 characters'
-              }
-            }
+                message: 'Password must be more than 8 characters',
+              },
+            },
           },
           confirmPassword: {
             validators: {
               notEmpty: {
-                message: 'Please confirm new password'
+                message: 'Please confirm new password',
               },
               identical: {
                 compare: function () {
-                  return formChangePass.querySelector('[name="newPassword"]').value
+                  return formChangePass.querySelector('[name="newPassword"]').value;
                 },
-                message: 'The password and its confirm are not the same'
+                message: 'The password and its confirm are not the same',
               },
               stringLength: {
                 min: 8,
-                message: 'Password must be more than 8 characters'
-              }
-            }
-          }
+                message: 'Password must be more than 8 characters',
+              },
+            },
+          },
         },
         plugins: {
           trigger: new FormValidation.plugins.Trigger(),
           bootstrap5: new FormValidation.plugins.Bootstrap5({
             eleValidClass: '',
-            rowSelector: '.col-md-6'
+            rowSelector: '.col-md-6',
           }),
-          submitButton: new FormValidation.plugins.SubmitButton()
+          submitButton: new FormValidation.plugins.SubmitButton(),
           // Submit the form when all fields are valid
           // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
         },
-        init: instance => {
+        init: (instance) => {
           instance.on('plugins.message.placed', function (e) {
             if (e.element.parentElement.classList.contains('input-group')) {
-              e.element.parentElement.insertAdjacentElement('afterend', e.messageElement)
+              e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
             }
-          })
-        }
-      })
+          });
+        },
+      });
 
-      const formChangePassword = $('#formChangePassword')
+      const formChangePassword = $('#formChangePassword');
       fv.on('core.form.valid', function () {
         formChangePassword.block({
           message: elementLoader,
           css: { backgroundColor: 'transparent', border: '0' },
-          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-        })
+          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+        });
 
         $.ajax({
           type: 'POST',
           url: '?type=changePassword',
           data: $(formChangePassword).serialize(),
           success: function (res) {
-            formChangePassword.unblock()
+            formChangePassword.unblock();
             Swal.fire({
               icon: 'success',
               title: 'Good Job!',
               text: res.msg,
               customClass: {
-                confirmButton: 'btn btn-success waves-effect waves-light'
-              }
-            })
+                confirmButton: 'btn btn-success waves-effect waves-light',
+              },
+            });
           },
           error: function (error) {
-            formChangePassword.unblock()
-            const msg = error.responseJSON?.msg
+            formChangePassword.unblock();
+            const msg = error.responseJSON?.msg;
             Swal.fire({
               icon: 'error',
               title: 'Opps!',
               text: msg,
               customClass: {
-                confirmButton: 'btn btn-danger waves-effect waves-light'
-              }
-            })
-          }
-        })
-      })
+                confirmButton: 'btn btn-danger waves-effect waves-light',
+              },
+            });
+          },
+        });
+      });
     }
 
     if (deactivateAcc) {
@@ -227,15 +227,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
           accountActivation: {
             validators: {
               notEmpty: {
-                message: 'Please confirm you want to delete account'
-              }
-            }
-          }
+                message: 'Please confirm you want to delete account',
+              },
+            },
+          },
         },
         plugins: {
           trigger: new FormValidation.plugins.Trigger(),
           bootstrap5: new FormValidation.plugins.Bootstrap5({
-            eleValidClass: ''
+            eleValidClass: '',
           }),
           submitButton: new FormValidation.plugins.SubmitButton(),
           fieldStatus: new FormValidation.plugins.FieldStatus({
@@ -245,24 +245,24 @@ document.addEventListener('DOMContentLoaded', function (e) {
                   // so user has a chance to submit the form again
                   deactivateButton.removeAttribute('disabled')
                 : // Disable the submit button
-                  deactivateButton.setAttribute('disabled', 'disabled')
-            }
-          })
+                  deactivateButton.setAttribute('disabled', 'disabled');
+            },
+          }),
           // Submit the form when all fields are valid
           // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
         },
-        init: instance => {
+        init: (instance) => {
           instance.on('plugins.message.placed', function (e) {
             if (e.element.parentElement.classList.contains('input-group')) {
-              e.element.parentElement.insertAdjacentElement('afterend', e.messageElement)
+              e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
             }
-          })
-        }
-      })
+          });
+        },
+      });
     }
 
     // Deactivate account alert
-    const accountActivation = document.querySelector('#accountActivation')
+    const accountActivation = document.querySelector('#accountActivation');
 
     // Alert With Functional Confirm Button
     if (deactivateButton) {
@@ -275,111 +275,112 @@ document.addEventListener('DOMContentLoaded', function (e) {
             confirmButtonText: 'Yes',
             customClass: {
               confirmButton: 'btn btn-primary me-2 waves-effect waves-light',
-              cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+              cancelButton: 'btn btn-label-secondary waves-effect waves-light',
             },
-            buttonsStyling: false
+            buttonsStyling: false,
           }).then(function (result) {
             if (result.value) {
               $.blockUI({
                 message: elementLoader,
                 css: { backgroundColor: 'transparent', border: '0' },
-                overlayCSS: { backgroundColor: '#fff', opacity: 0.8 }
-              })
+                overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+              });
 
               $.ajax({
                 type: 'DELETE',
                 url: '?',
                 success: function (res) {
-                  $.unblockUI()
+                  $.unblockUI();
+
                   Swal.fire({
                     icon: 'success',
                     title: 'Good Job!',
                     text: res.msg,
                     customClass: {
-                      confirmButton: 'btn btn-success waves-effect waves-light'
-                    }
-                  })
+                      confirmButton: 'btn btn-success waves-effect waves-light',
+                    },
+                  }).then(() => (window.location.href = '/auth/login'));
                 },
                 error: function (error) {
-                  $.unblockUI()
-                  const msg = error.responseJSON?.msg
+                  $.unblockUI();
+                  const msg = error.responseJSON?.msg;
                   Swal.fire({
                     icon: 'error',
                     title: 'Opps!',
                     text: msg,
                     customClass: {
-                      confirmButton: 'btn btn-danger waves-effect waves-light'
-                    }
-                  })
-                }
-              })
+                      confirmButton: 'btn btn-danger waves-effect waves-light',
+                    },
+                  });
+                },
+              });
             } else if (result.dismiss === Swal.DismissReason.cancel) {
               Swal.fire({
                 title: 'Cancelled',
                 text: 'Deactivation Cancelled!!',
                 icon: 'error',
                 customClass: {
-                  confirmButton: 'btn btn-success waves-effect waves-light'
-                }
-              })
+                  confirmButton: 'btn btn-success waves-effect waves-light',
+                },
+              });
             }
-          })
+          });
         }
-      }
+      };
     }
 
     // Update/reset user image of account page
-    let accountUserImage = document.getElementById('uploadedAvatar')
+    let accountUserImage = document.getElementById('uploadedAvatar');
     const fileInput = document.querySelector('.account-file-input'),
-      resetFileInput = document.querySelector('.account-image-reset')
+      resetFileInput = document.querySelector('.account-image-reset');
 
     if (accountUserImage) {
-      const resetImage = accountUserImage.src
+      const resetImage = accountUserImage.src;
       fileInput.onchange = () => {
         if (fileInput.files[0]) {
-          accountUserImage.src = window.URL.createObjectURL(fileInput.files[0])
+          accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
 
-          $('.btn-save').prop('disabled', true)
-          const file = $('.account-file-input')[0].files[0]
+          $('.btn-save').prop('disabled', true);
+          const file = $('.account-file-input')[0].files[0];
           if (file) {
-            const storageRef = storage.ref().child('avatars/' + file.name)
-            const uploadTask = storageRef.put(file)
+            const storageRef = storage.ref().child('avatars/' + file.name);
+            const uploadTask = storageRef.put(file);
             uploadTask.on(
               'state_changed',
-              snapshot => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-                console.log('Upload progress: ' + progress + '%')
+              (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload progress: ' + progress + '%');
               },
-              error => {
-                console.error('Error uploading file: ', error)
+              (error) => {
+                console.error('Error uploading file: ', error);
               },
               () => {
-                uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-                  $('#avatar').val(downloadURL)
-                  $('.btn-save').prop('disabled', false)
-                })
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                  $('#avatar').val(downloadURL);
+                  $('.btn-save').prop('disabled', false);
+                });
               }
-            )
+            );
           }
         }
-      }
+      };
       resetFileInput.onclick = () => {
-        fileInput.value = ''
-        accountUserImage.src = resetImage
-      }
+        fileInput.value = '';
+        accountUserImage.src = resetImage;
+      };
     }
-  })()
-})
+  })();
+});
 
 // Select2 (jquery)
 $(function () {
-  const countryPhone = $('#countryPhone')
-  const countryCode = $('#countryCode')
+  const countryPhone = $('#countryPhone');
+  const countryCode = $('#countryCode');
 
   if (countryPhone) {
     $.get('https://ipwhois.app/json/', function (data) {
-      countryPhone.val(data.country_phone.replace('+', ''))
-      countryCode.html(`${data.country_code} (${data.country_phone})`)
-    })
+      countryPhone.val(data.country_phone.replace('+', ''));
+      countryCode.html(`${data.country_code} (${data.country_phone})`);
+    });
   }
-})
+});
