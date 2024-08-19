@@ -43,6 +43,7 @@ $(document).ready(function () {
         { data: '' },
         { data: 'ip' },
         { data: 'status' },
+        { data: 'userId' },
         { data: 'keyId' },
         { data: 'platform' },
         { data: 'totalHitsPerDay' },
