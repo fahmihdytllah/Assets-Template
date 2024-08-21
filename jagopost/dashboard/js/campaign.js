@@ -271,13 +271,6 @@ $(function () {
         </div>`);
       } else {
         res.data.forEach((camp) => {
-          const schedule =
-            camp.days.length == '7'
-              ? 'Repeat every day'
-              : camp.days.length == '6' && camp.days.includes('Sun')
-              ? 'Repeats every Monday to Friday'
-              : `Repeats every ${camp.days.join(', ')}`;
-
           let keywords = '';
           camp.keywords.forEach((keyword) => {
             keywords += '<span class="badge rounded-pill me-1 mb-1 bg-label-dark fw-medium">' + keyword + '</span>';
@@ -306,7 +299,7 @@ $(function () {
               <div class="mb-2">
                 ${keywords}
               </div>
-              <span class="text-muted">${schedule}</span>
+              <span class="text-muted">${camp.cronText}</span>
             </div>
           </div>`);
         });
