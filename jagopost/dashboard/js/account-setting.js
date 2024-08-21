@@ -374,8 +374,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
 // Select2 (jquery)
 $(function () {
-  const countryPhone = $('#countryPhone');
-  const countryCode = $('#countryCode');
+  const countryPhone = $('#countryPhone'),
+    countryCode = $('#countryCode'),
+    select2 = $('.select2');
+
+  if (select2.length) {
+    select2.each(function () {
+      var $this = $(this);
+      $this.wrap('<div class="position-relative"></div>').select2({
+        placeholder: 'Select value',
+        dropdownParent: $this.parent(),
+      });
+    });
+  }
 
   if (countryPhone) {
     $.get('https://ipwhois.app/json/', function (data) {

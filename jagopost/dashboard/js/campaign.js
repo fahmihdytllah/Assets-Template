@@ -39,7 +39,6 @@ $(function () {
 
     $('#typeSearch').val(['articlecity']).trigger('change');
     $('#language').val('en').trigger('change');
-    $('#timezone').val('Asia/Jakarta').trigger('change');
     $('.translateContent').prop('disabled', false);
     $('.spinnerContent').prop('disabled', false);
 
@@ -336,7 +335,6 @@ $(function () {
 
       /** scheduling */
       $('#hours').val(res.data?.hours);
-      $('#timezone').val(res.data?.timezone).trigger('change');
       $('input[name="days"]').each(function () {
         var day = $(this).val();
         if (res.data?.days.includes(day)) {

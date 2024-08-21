@@ -161,10 +161,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
               }, 2000);
             }
           },
-          error: function (error) {
+          error: function (err) {
             formAuth.unblock();
-            const msg = error.responseJSON.msg;
-            toastr.error(msg, 'Opss!');
+            let msg = err.responseJSON?.msg;
+            toastr.error(msg ? msg : 'There is an error!', 'Opss!');
           },
         });
       });
@@ -204,10 +204,10 @@ function callbackGoogleLogin(response) {
         window.location.href = redirectUri ? redirectUri : res?.redirectTo;
       }, 1500);
     },
-    error: function (e) {
+    error: function (err) {
       $.unblockUI();
-      const msg = e.responseJSON.msg;
-      toastr.error(msg, 'Opss!');
+      let msg = err.responseJSON?.msg;
+      toastr.error(msg ? msg : 'There is an error!', 'Opss!');
     },
   });
 }
@@ -236,10 +236,10 @@ function callbackGoogleRegister(response) {
         window.location.href = redirectUri ? redirectUri : res?.redirectTo;
       }, 1500);
     },
-    error: function (e) {
+    error: function (err) {
       $.unblockUI();
-      const msg = e.responseJSON.msg;
-      toastr.error(msg, 'Opss!');
+      let msg = err.responseJSON?.msg;
+      toastr.error(msg ? msg : 'There is an error!', 'Opss!');
     },
   });
 }
