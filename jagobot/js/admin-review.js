@@ -50,7 +50,7 @@ $(document).ready(function () {
   formEditReview.submit(function (e) {
     e.preventDefault();
     formEditReview.block({
-      message: elementLoader,
+      message: itemLoader,
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
@@ -95,7 +95,7 @@ $(document).ready(function () {
         type: 'GET',
         beforeSend: function () {
           $('.card').block({
-            message: elementLoader,
+            message: itemLoader,
             css: { backgroundColor: 'transparent', border: '0' },
             overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
           });
@@ -467,7 +467,7 @@ $(document).ready(function () {
 
   function showModalEditReview(id) {
     $.blockUI({
-      message: elementLoader,
+      message: itemLoader,
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
@@ -498,7 +498,7 @@ $(document).ready(function () {
 
   function deleteReview($this, id) {
     $.blockUI({
-      message: elementLoader,
+      message: itemLoader,
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });

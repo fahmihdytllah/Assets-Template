@@ -3,6 +3,7 @@ $(document).ready(function () {
   const formSettingKey = $('#formSettingKey');
   const countryPhone = $('#countryPhone');
   const countryCode = $('#countryCode');
+  let showKey = {};
 
   // load Key
   loadKeys();
@@ -10,7 +11,11 @@ $(document).ready(function () {
   // handle event
   $('#formAddKey').submit(function (e) {
     e.preventDefault();
-    formAddKey.block({ message: itemLoader, css: { backgroundColor: 'transparent', border: '0' }, overlayCSS: { backgroundColor: '#fff', opacity: 0.8 } });
+    formAddKey.block({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       url: $(this).attr('action'),
       type: 'POST',
@@ -19,19 +24,35 @@ $(document).ready(function () {
         formAddKey.unblock();
         $('#modalAddKey').modal('hide');
         loadKeys();
-        Swal.fire({ title: 'Good job!', text: res.msg, icon: 'success', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Good job!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
       error: function (e) {
         formAddKey.unblock();
         let msg = e.responseJSON.msg;
-        Swal.fire({ title: 'Upss!', text: msg ? msg : 'There is an error!', icon: 'error', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
     });
   });
 
   formSettingKey.submit(function (e) {
     e.preventDefault();
-    formSettingKey.block({ message: itemLoader, css: { backgroundColor: 'transparent', border: '0' }, overlayCSS: { backgroundColor: '#fff', opacity: 0.8 } });
+    formSettingKey.block({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       url: $(this).attr('action'),
       type: 'PUT',
@@ -40,12 +61,24 @@ $(document).ready(function () {
         formSettingKey.unblock();
         loadKeys();
         $('#settingKeyModal').modal('hide');
-        Swal.fire({ title: 'Good job!', text: res.msg, icon: 'success', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Good job!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
       error: function (e) {
         formSettingKey.unblock();
         let msg = e.responseJSON.msg;
-        Swal.fire({ title: 'Upss!', text: msg ? msg : 'There is an error!', icon: 'error', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
     });
   });
@@ -108,7 +141,10 @@ $(document).ready(function () {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes',
-      customClass: { confirmButton: 'btn btn-primary waves-effect waves-light', cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light' },
+      customClass: {
+        confirmButton: 'btn btn-primary waves-effect waves-light',
+        cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light',
+      },
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
@@ -125,13 +161,35 @@ $(document).ready(function () {
       icon: 'info',
       showCancelButton: true,
       confirmButtonText: 'Yes',
-      customClass: { confirmButton: 'btn btn-primary waves-effect waves-light', cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light' },
+      customClass: {
+        confirmButton: 'btn btn-primary waves-effect waves-light',
+        cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light',
+      },
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
         buyKey(idKey, typeKey);
       }
     });
+  });
+
+  $(document).on('click', '.show-key', function () {
+    let idKey = $(this).data('id');
+    let key = $(this).data('key');
+
+    if (typeof showKey[idKey] === 'undefined') {
+      showKey[idKey] = false; // Inisialisasi jika belum ada
+    }
+
+    if (showKey[idKey]) {
+      $('#key-' + idKey).html('******************');
+      $(this).html('<i class="ti ti-eye ti-sm"></i>');
+    } else {
+      $('#key-' + idKey).html(key);
+      $(this).html('<i class="ti ti-eye-off ti-sm"></i>');
+    }
+
+    showKey[idKey] = !showKey[idKey];
   });
 
   function settingKey(id) {
@@ -247,7 +305,6 @@ $(document).ready(function () {
         $('#autoSendReport').prop('checked', false);
       }
 
-
       $('#settingKeyModal').modal('show');
     });
   }
@@ -269,7 +326,9 @@ $(document).ready(function () {
           const statusKey = key.status === 'Active' ? 'success' : key.status === 'Pending' ? 'warning' : 'danger';
           const isBtnBuyOrRenew =
             (key.status === 'Expired' && key.type !== 'trial') || key.status === 'Pending'
-              ? ` <button data-id="${key._id}" data-type="${key.type}" class="btn btn-sm rounded-pill btn-label-primary mb-2 btn-buy">
+              ? ` <button data-id="${key._id}" data-type="${
+                  key.type
+                }" class="btn btn-sm rounded-pill btn-label-primary mb-2 btn-buy">
               <span class="ti-xs ti ti-wallet me-1"></span>${key.status === 'Pending' ? 'Bayar' : 'Perpanjang'}
             </button><br/>`
               : '';
@@ -279,8 +338,12 @@ $(document).ready(function () {
               <div class="dropdown api-key-actions">
                 <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
                 <div class="dropdown-menu dropdown-menu-end">
-                  <button class="dropdown-item key-setting" data-id="${key._id}" ${key.status === 'Expired' ? 'disabled' : ''}><i class="ti ti-settings-code me-2"></i>Pengaturan</button>
-                  <button class="dropdown-item key-delete" data-id="${key._id}" ${key.type === 'trial' && key.status === 'Expired' ? 'disabled' : ''}><i class="ti ti-trash me-2"></i>Hapus</button>
+                  <button class="dropdown-item key-setting" data-id="${key._id}" ${
+            key.status === 'Expired' ? 'disabled' : ''
+          }><i class="ti ti-settings-code me-2"></i>Pengaturan</button>
+                  <button class="dropdown-item text-danger key-delete" data-id="${key._id}" ${
+            key.type === 'trial' && key.status === 'Expired' ? 'disabled' : ''
+          }><i class="ti ti-trash me-2"></i>Hapus</button>
                 </div>
               </div>
               <div class="d-flex align-items-center mb-3">
@@ -289,8 +352,13 @@ $(document).ready(function () {
                 <span class="badge bg-label-${statusKey}">${key.status.toUpperCase()}</span>
               </div>
               <div class="d-flex align-items-center mb-3">
-                <p class="me-2 mb-0 fw-medium">${key.key}</p>
-                <span class="text-muted cursor-pointer copy-key" data-key="${key.key}"><i class="ti ti-copy ti-sm"></i></span>
+                <p class="me-2 mb-0 fw-medium" id="key-${key._id}">******************</p>
+                  <span class="text-muted cursor-pointer me-2 show-key" data-id="${key._id}" data-key="${
+            key.key
+          }"><i class="ti ti-eye ti-sm"></i></span>
+                <span class="text-muted cursor-pointer copy-key" data-key="${
+                  key.key
+                }"><i class="ti ti-copy ti-sm"></i></span>
               </div>
               ${isBtnBuyOrRenew}
               <span class="text-muted">Expires on ${moment(key.expiredAt).calendar()}</span>
@@ -302,7 +370,11 @@ $(document).ready(function () {
   }
 
   function buyKey(id, type) {
-    $.blockUI({ message: itemLoader, css: { backgroundColor: 'transparent', border: '0' }, overlayCSS: { backgroundColor: '#fff', opacity: 0.8 } });
+    $.blockUI({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       url: '/api/payment',
       data: { id, type },
@@ -314,7 +386,13 @@ $(document).ready(function () {
       error: function (e) {
         $.unblockUI();
         const msg = e.responseJSON.msg;
-        Swal.fire({ title: 'Upss!', text: msg ? msg : 'There is an error!', icon: 'error', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
     });
   }
@@ -325,19 +403,41 @@ $(document).ready(function () {
         paymentProcess(data);
       },
       onPending: function (data) {
-        Swal.fire({ title: 'Info!', text: data.msg, icon: 'info', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Info!',
+          text: data.msg,
+          icon: 'info',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
       onError: function (data) {
-        Swal.fire({ title: 'Upss!', text: data.msg, icon: 'info', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Upss!',
+          text: data.msg,
+          icon: 'info',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
       onClose: function () {
-        Swal.fire({ title: 'Warning!', text: 'The payment window has closed!', icon: 'info', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Warning!',
+          text: 'The payment window has closed!',
+          icon: 'info',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
     });
   }
 
   function paymentProcess(res) {
-    $.blockUI({ message: itemLoader, css: { backgroundColor: 'transparent', border: '0' }, overlayCSS: { backgroundColor: '#fff', opacity: 0.8 } });
+    $.blockUI({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       data: {
         orderId: res.transaction.order_id,
@@ -347,30 +447,58 @@ $(document).ready(function () {
       type: 'POST',
       success: function (res) {
         $.unblockUI();
-        Swal.fire({ title: 'Good job!', text: 'Your payment has been successful 🎉', icon: 'success', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 }).then(() => location.reload());
+        Swal.fire({
+          title: 'Good job!',
+          text: 'Your payment has been successful 🎉',
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        }).then(() => location.reload());
       },
       error: function (e) {
         $.unblockUI();
         const msg = e.responseJSON.msg;
-        Swal.fire({ title: 'Upss!', text: msg ? msg : 'There is an error!', icon: 'error', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
     });
   }
 
   function deleteKey(id) {
-    $.blockUI({ message: itemLoader, css: { backgroundColor: 'transparent', border: '0' }, overlayCSS: { backgroundColor: '#fff', opacity: 0.8 } });
+    $.blockUI({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
     $.ajax({
       url: 'keys?id=' + id,
       type: 'DELETE',
       success: function (res) {
         $.unblockUI();
         loadKeys();
-        Swal.fire({ title: 'Good job!', text: res.msg, icon: 'success', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Good job!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
       error: function (e) {
         $.unblockUI();
         let msg = e.responseJSON.msg;
-        Swal.fire({ title: 'Upss!', text: msg ? msg : 'There is an error!', icon: 'error', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 });
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
       },
     });
   }
@@ -378,7 +506,15 @@ $(document).ready(function () {
   const copyText = (text) => {
     navigator.clipboard
       .writeText(text)
-      .then(() => Swal.fire({ title: 'Good job!', text: 'Successfully copied Access Key', icon: 'success', customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' }, buttonsStyling: !1 }))
+      .then(() =>
+        Swal.fire({
+          title: 'Good job!',
+          text: 'Successfully copied Access Key',
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        })
+      )
       .catch(() => console.log('Gagal mengcopy!'));
   };
 
