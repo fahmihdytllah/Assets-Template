@@ -82,7 +82,7 @@ $(document).ready(function () {
           targets: 2,
           render: function (data, type, full, meta) {
             return `<span class="badge rounded-pill bg-label-${full?.isActive ? 'success' : 'danger'} me-1">${
-              full?.isActive ? Active : 'Non Active'
+              full?.isActive ? 'Active' : 'Non Active'
             }</span>`;
           },
         },
