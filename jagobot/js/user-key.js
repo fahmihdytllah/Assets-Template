@@ -58,8 +58,9 @@ $(document).ready(function () {
       type: 'PUT',
       data: $(this).serialize(),
       success: function (res) {
-        formSettingKey.unblock();
         loadKeys();
+        formSettingKey.unblock();
+        formSettingKey[0].reset();
         $('#settingKeyModal').modal('hide');
         Swal.fire({
           title: 'Good job!',
@@ -94,15 +95,15 @@ $(document).ready(function () {
     }
   });
 
-  $('#autoSendReport').change(function () {
+  $('#isAdClick').change(function () {
     if ($(this).is(':checked')) {
-      $('#formNumber').show();
+      $('#formAdClick').show();
     } else {
-      $('#formNumber').hide();
+      $('#formAdClick').hide();
     }
   });
 
-  $('#withProxy').change(function () {
+  $('#isCustomProxy').change(function () {
     if ($(this).is(':checked')) {
       $('#formProxy').show();
     } else {
@@ -110,7 +111,7 @@ $(document).ready(function () {
     }
   });
 
-  $('#customReferer').change(function () {
+  $('#isCustomReferer').change(function () {
     if ($(this).is(':checked')) {
       $('#formReferer').show();
     } else {
@@ -118,11 +119,12 @@ $(document).ready(function () {
     }
   });
 
-  $('#randomUserAgent').change(function () {
+  $('#isRandomDesktop').change(function () {
     if ($(this).is(':checked')) {
-      $('#autoSwitch').prop('disabled', false);
+      $('#isAutoSwitch').prop('disabled', false);
     } else {
-      $('#autoSwitch').prop('disabled', true);
+      $('#isAutoSwitch').prop('checked', false);
+      $('#isAutoSwitch').prop('disabled', true);
     }
   });
 
@@ -193,11 +195,11 @@ $(document).ready(function () {
   });
 
   function settingKey(id) {
-    $.get(`keys?type=detail&id=${id}`, function (res) {
+    $.get('keys?type=detail&id=' + id, function (res) {
+      /** Append data */
       $('#idKey').val(res.data._id);
       $('#nameEditKey').val(res.data.name);
       $('#taskBot').val(res.data.taskBot);
-      $('#clickAds').val(res.data.clickAds);
       $('#urlType').val(res.data.urlType);
 
       if (res.data.urlType === 'blogger' || res.data.urlType === 'wordpress') {
@@ -210,99 +212,102 @@ $(document).ready(function () {
         $('#urlManual').val(res.data.urlManual.join('\n'));
       }
 
-      if (res.data.type === 'trial') {
-        $('#exBlog').prop('checked', false);
-        $('#exBlog').prop('disabled', true);
-        $('#withProxy').prop('checked', false);
-        $('#withProxy').prop('disabled', true);
-        $('#customReferer').prop('checked', false);
-        $('#customReferer').prop('disabled', true);
-        $('#randomUserAgent').prop('checked', false);
-        $('#randomUserAgent').prop('disabled', true);
-        $('#autoSwitch').prop('checked', false);
-        $('#autoSwitch').prop('disabled', true);
-        $('#autoSendReport').prop('checked', false);
-        $('#autoSendReport').prop('disabled', true);
+      if (res.data.isRegularVisitor) {
+        $('#isRegularVisitor').prop('checked', true);
       }
 
-      if (res.data.type === 'basic') {
-        $('#exBlog').prop('disabled', false);
-        $('#withProxy').prop('checked', false);
-        $('#withProxy').prop('disabled', true);
-        $('#customReferer').prop('checked', false);
-        $('#customReferer').prop('disabled', true);
-        $('#randomUserAgent').prop('checked', false);
-        $('#randomUserAgent').prop('disabled', true);
-        $('#autoSwitch').prop('checked', false);
-        $('#autoSwitch').prop('disabled', true);
-        $('#autoSendReport').prop('checked', false);
-        $('#autoSendReport').prop('disabled', true);
-      }
-
-      if (res.data.type === 'premium') {
-        $('#exBlog').prop('disabled', false);
-        $('#withProxy').prop('disabled', false);
-        $('#customReferer').prop('checked', false);
-        $('#customReferer').prop('disabled', true);
-        $('#randomUserAgent').prop('checked', false);
-        $('#randomUserAgent').prop('disabled', true);
-        $('#autoSwitch').prop('checked', false);
-        $('#autoSwitch').prop('disabled', true);
-        $('#autoSendReport').prop('checked', false);
-        $('#autoSendReport').prop('disabled', true);
-      }
-
-      if (res.data.type === 'unlimited') {
-        $('#exBlog').prop('disabled', false);
-        $('#withProxy').prop('disabled', false);
-        $('#customReferer').prop('disabled', false);
-        $('#randomUserAgent').prop('disabled', false);
-        $('#autoSendReport').prop('disabled', false);
-      }
-
-      if (res.data.regularVisitor) {
-        $('#visitor').prop('checked', true);
-      }
-
-      if (res.data.type !== 'trial' && res.data.exBlog) {
+      if (res.data.exBlog) {
         $('#exBlog').prop('checked', true);
       }
 
-      if ((res.data.type !== 'trial' || res.data.type !== 'basic') && res.data.withProxy) {
-        $('#withProxy').prop('checked', true);
-        $('#formProxy').show();
-        $('#listProxy').val(res.data.proxy.join('\n'));
+      if (res.data.isAdClick) {
+        $('#isAdClick').prop('checked', true);
+        $('#formAdClick').show();
+        $('#repeatAdClick').val(res.data.repeatAdClick);
+        $('input[name="adType"][value="' + res.data.adType + '"]').prop('checked', true);
       } else {
-        $('#withProxy').prop('checked', false);
+        $('#isAdClick').prop('checked', false);
+        $('#formAdClick').hide();
+      }
+
+      if (res.data.isCustomProxy) {
+        $('#isCustomProxy').prop('checked', true);
+        $('#formProxy').show();
+        $('#listProxys').val(res.data.listProxys.join('\n'));
+      } else {
+        $('#isCustomProxy').prop('checked', false);
         $('#formProxy').hide();
       }
 
-      if (res.data.type === 'unlimited' && res.data.customReferer) {
-        $('#customReferer').prop('checked', true);
+      if (res.data.isCustomReferer) {
+        $('#isCustomReferer').prop('checked', true);
         $('#formReferer').show();
-        $('#listReferer').val(res.data.referer.join('\n'));
+        $('#listReferers').val(res.data.listReferers.join('\n'));
       } else {
-        $('#customReferer').prop('checked', false);
+        $('#isCustomReferer').prop('checked', false);
         $('#formReferer').hide();
       }
 
-      if (res.data.type === 'unlimited' && res.data.randomUserAgent) {
-        $('#randomUserAgent').prop('checked', true);
-        $('#autoSwitch').prop('disabled', false);
-        $('#autoSwitch').prop('checked', true);
+      if (res.data.isRandomDesktop) {
+        $('#isRandomDesktop').prop('checked', true);
+        $('#isAutoSwitch').prop('disabled', false);
+        $('#isAutoSwitch').prop('checked', true);
       } else {
-        $('#randomUserAgent').prop('checked', false);
-        $('#autoSwitch').prop('disabled', true);
+        $('#isAutoSwitch').prop('checked', false);
+        $('#isRandomDesktop').prop('checked', false);
+        $('#isAutoSwitch').prop('disabled', true);
       }
 
-      if (res.data.type === 'unlimited' && res.data.autoSendReport) {
-        $('#autoSendReport').prop('checked', true);
-        $('#formNumber').show();
-        $('#number').val(res.data.number);
-        countryPhone.val(res.data.countryPhone);
+      if (res.data.isAutoSendReport) {
+        $('#isAutoSendReport').prop('checked', true);
       } else {
-        $('#formNumber').hide();
-        $('#autoSendReport').prop('checked', false);
+        $('#isAutoSendReport').prop('checked', false);
+      }
+
+      /** Lock feature */
+      if (res.data.type === 'trial') {
+        $('#isAdClick').prop('checked', false);
+        $('#isAdClick').prop('disabled', true);
+        $('#isCustomProxy').prop('checked', false);
+        $('#isCustomProxy').prop('disabled', true);
+        $('#isAutoSendReport').prop('checked', false);
+        $('#isAutoSendReport').prop('disabled', true);
+        $('#isRandomDesktop').prop('checked', false);
+        $('#isRandomDesktop').prop('disabled', true);
+        $('#isAutoSwitch').prop('checked', false);
+        $('#isAutoSwitch').prop('disabled', true);
+        $('#isCustomReferer').prop('checked', false);
+        $('#isCustomReferer').prop('disabled', true);
+      }
+
+      if (res.data.type === 'basic') {
+        $('#isAdClick').prop('checked', false);
+        $('#isAdClick').prop('disabled', true);
+        $('#isCustomProxy').prop('checked', false);
+        $('#isCustomProxy').prop('disabled', true);
+        $('#isAutoSendReport').prop('checked', false);
+        $('#isAutoSendReport').prop('disabled', true);
+      }
+
+      if (res.data.type === 'premium') {
+        $('#isAutoSendReport').prop('checked', false);
+        $('#isAutoSendReport').prop('disabled', true);
+      }
+
+      /** Unlock feature */
+      if (res.data.type === 'basic') {
+        $('#isRandomDesktop').prop('disabled', false);
+        $('#isAutoSwitch').prop('disabled', false);
+        $('#isCustomReferer').prop('disabled', false);
+      }
+
+      if (res.data.type === 'premium') {
+        $('#isAdClick').prop('disabled', false);
+        $('#isCustomProxy').prop('disabled', false);
+      }
+
+      if (res.data.type === 'unlimited') {
+        $('#isAutoSendReport').prop('disabled', false);
       }
 
       $('#settingKeyModal').modal('show');

@@ -42,9 +42,9 @@ $(document).ready(function () {
       columns: [
         { data: '' },
         { data: 'ip' },
-        { data: 'status' },
+        { data: 'isActive' },
         { data: 'keyId' },
-        { data: 'platform' },
+        { data: 'network' },
         { data: 'totalHitsPerDay' },
         { data: 'totalViewAdsPerDay' },
         { data: 'totalClickAdsPerDay' },
@@ -81,8 +81,8 @@ $(document).ready(function () {
           responsivePriority: 3,
           targets: 2,
           render: function (data, type, full, meta) {
-            return `<span class="badge rounded-pill bg-label-${full.status === 'Active' ? 'success' : 'danger'} me-1">${
-              full.status
+            return `<span class="badge rounded-pill bg-label-${full?.isActive ? 'success' : 'danger'} me-1">${
+              full?.isActive ? Active : 'Non Active'
             }</span>`;
           },
         },
