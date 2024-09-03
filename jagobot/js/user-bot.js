@@ -61,7 +61,7 @@ $(document).ready(function () {
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        deleteBot($this, idBot);
+        deleteBot(idBot);
       }
     });
   });
@@ -169,23 +169,26 @@ $(document).ready(function () {
                     <li class="d-flex align-items-center mb-2"><i class="ti ti-users ti-sm text-secondary"></i><span class="text-muted mx-2 totalHitsPerDay">${bot.totalHitsPerDay.toLocaleString()}</span></li>
                     <li class="d-flex align-items-center mb-2"><i class="ti ti-ad ti-sm text-secondary"></i><span class="text-muted mx-2 totalViewAdsPerDay">${bot.totalViewAdsPerDay.toLocaleString()}</span></li>
                     <li class="d-flex align-items-center mb-2"><i class="ti ti-click ti-sm text-secondary"></i><span class="text-muted mx-2 totalClickAdsPerDay">${bot.totalClickAdsPerDay.toLocaleString()}</span></li>
-                    <li class="d-flex align-items-center"><i class="ti ti-exclamation-circle ti-sm text-secondary"></i><span class="text-muted mx-2 totalErrorPerDay">${bot.totalErrorPerDay.toLocaleString()}</span></li>
+                    <li class="d-flex align-items-center mb-2"><i class="ti ti-exclamation-circle ti-sm text-secondary"></i><span class="text-muted mx-2 totalErrorPerDay">${bot.totalErrorPerDay.toLocaleString()}</span></li>
+                    <li class="d-flex align-items-center bot-delete" data-id="${
+                      bot._id
+                    }"><i class="ti ti-trash ti-sm text-secondary"></i><span class="text-muted mx-2">Delete</span></li>
                   </ul>
                 </div>
                 <div class="col-8">
-                <ul class="list-unstyled">
+                  <ul class="list-unstyled">
+                    <li class="d-flex align-items-center mb-2"><i class="ti ti-key ti-sm text-secondary"></i><span class="text-muted mx-2 network">${
+                      bot.keyId.name
+                    }</span></li>
                     <li class="d-flex align-items-center mb-2"><i class="ti ti-network ti-sm text-secondary"></i><span class="text-muted mx-2 network">${
                       bot.network
                     }</span></li>
                     <li class="d-flex align-items-center mb-2"><i class="ti ti-clock ti-sm text-secondary"></i><span class="text-muted mx-2 uptime">${
                       bot.uptime
                     }</span></li>
-                    <li class="d-flex align-items-center mb-2"><i class="ti ti-activity ti-sm text-secondary"></i><span class="text-muted mx-2 lastActivity">${moment(
+                    <li class="d-flex align-items-center"><i class="ti ti-activity ti-sm text-secondary"></i><span class="text-muted mx-2 lastActivity">${moment(
                       bot.lastActivity
                     ).fromNow()}</span></li>
-                    <li class="d-flex align-items-center bot-delete" data-id="${
-                      bot._id
-                    }"><i class="ti ti-trash ti-sm text-secondary"></i><span class="text-muted mx-2">Delete</span></li>
                   </ul>
                 </div>
               </div>
@@ -194,6 +197,42 @@ $(document).ready(function () {
         </div>`);
       });
     }
+  }
+
+  function deleteBot(id) {
+    $.blockUI({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: '?id=' + id,
+      type: 'DELETE',
+      success: function (d) {
+        $.unblockUI();
+        $('#bot-' + id).remove();
+
+        Swal.fire({
+          title: 'Good job!',
+          text: d.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
+      },
+      error: function (e) {
+        $.unblockUI();
+        let msg = e.responseJSON.msg;
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
+      },
+    });
   }
 
   function setIsPaused(bot) {
