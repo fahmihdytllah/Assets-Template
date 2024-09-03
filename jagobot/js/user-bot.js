@@ -34,14 +34,15 @@ $(document).ready(function () {
     }
 
     /** Update Views */
+    elementListBots.prepend($('#bot-' + bot._id));
+    $('#bot-' + bot._id + ' .bot-status').html(setIsActive(bot));
+    $('#bot-' + bot._id + ' .btn-start').html(setIsPaused(bot));
     $('#bot-' + bot._id + ' .totalHitsPerDay').html(bot.totalHitsPerDay.toLocaleString());
     $('#bot-' + bot._id + ' .totalClickAdsPerDay').html(bot.totalClickAdsPerDay.toLocaleString());
     $('#bot-' + bot._id + ' .totalViewAdsPerDay').html(bot.totalViewAdsPerDay.toLocaleString());
     $('#bot-' + bot._id + ' .totalErrorPerDay').html(bot.totalErrorPerDay.toLocaleString());
     $('#bot-' + bot._id + ' .uptime').html(bot.uptime);
     $('#bot-' + bot._id + ' .lastActivity').html(moment(bot.lastActivity).fromNow());
-    $('#bot-' + bot._id + ' .bot-status').html(setIsActive(bot));
-    $('#bot-' + bot._id + ' .btn-start').html(setIsPaused(bot));
   });
 
   /** Events jquery */
