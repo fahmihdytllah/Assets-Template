@@ -338,24 +338,28 @@ $(document).ready(function () {
             </button><br/>`
               : '';
 
-          $('#listKeys').append(`<div class="col-md-6">
-            <div class="bg-lighter rounded p-3 mb-3 position-relative">
-              <div class="dropdown api-key-actions">
-                <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
-                <div class="dropdown-menu dropdown-menu-end">
-                  <button class="dropdown-item key-setting" data-id="${key._id}" ${
+          $('#listKeys').append(`<div class="col-md-6 col-xl-4">
+            <div class="card card-key mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                  <h4 class="mb-0 me-3">${key.name}</h4>
+                  <span class="badge rounded-pill bg-label-info me-2">${key.type.toUpperCase()}</span>
+                  <span class="badge rounded-pill bg-label-${statusKey}">${key.status.toUpperCase()}</span>
+                </div>
+
+                <div class="dropdown">
+                  <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
+                  <div class="dropdown-menu dropdown-menu-start">
+                    <button class="dropdown-item key-setting" data-id="${key._id}" ${
             key.status === 'Expired' ? 'disabled' : ''
           }><i class="ti ti-settings-code me-2"></i>Pengaturan</button>
-                  <button class="dropdown-item text-danger key-delete" data-id="${key._id}" ${
+                    <button class="dropdown-item text-danger key-delete" data-id="${key._id}" ${
             key.type === 'trial' && key.status === 'Expired' ? 'disabled' : ''
           }><i class="ti ti-trash me-2"></i>Hapus</button>
+                  </div>
                 </div>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <h4 class="mb-0 me-3">${key.name}</h4>
-                <span class="badge bg-label-info me-2">${key.type.toUpperCase()}</span>
-                <span class="badge bg-label-${statusKey}">${key.status.toUpperCase()}</span>
-              </div>
+
               <div class="d-flex align-items-center mb-3">
                 <p class="me-2 mb-0 fw-medium" id="key-${key._id}">******************</p>
                   <span class="text-muted cursor-pointer me-2 show-key" data-id="${key._id}" data-key="${
