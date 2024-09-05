@@ -1,7 +1,7 @@
 $(document).ready(function () {
   let elementListBots = $('#listBots'),
     socket = io(),
-    dataBots,
+    dataBots = [],
     showBots = {},
     uptimeBots = {},
     uptimeSeconds = {};
@@ -18,7 +18,7 @@ $(document).ready(function () {
   });
 
   socket.on('clientConnected', (bot) => {
-    const findBot = dataBots.find((q) => q._id === bot._id);
+    const findBot = dataBots?.find((q) => q._id === bot._id);
     if (findBot) {
       if (!findBot.isActive) {
         toastr.success('Bot ' + bot.ip + ' is active again', 'Bot is active again!');
@@ -37,7 +37,7 @@ $(document).ready(function () {
 
   socket.on('stopedBot', (bot) => {
     /** Update local array */
-    const indexBot = dataBots.findIndex((item) => item._id === bot._id);
+    const indexBot = dataBots?.findIndex((item) => item._id === bot._id);
     if (indexBot !== -1) {
       dataBots[indexBot] = { ...dataBots[indexBot], ...bot };
       const elementBot = $('#bot-' + bot._id);
@@ -46,7 +46,7 @@ $(document).ready(function () {
   });
 
   socket.on('updatedBot', (bot) => {
-    const indexBot = dataBots.findIndex((item) => item._id === bot._id);
+    const indexBot = dataBots?.findIndex((item) => item._id === bot._id);
     if (indexBot !== -1) {
       /** Update local array */
       const oldBot = dataBots[indexBot];
@@ -100,7 +100,7 @@ $(document).ready(function () {
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        const findBot = dataBots.find((item) => item._id === id);
+        const findBot = dataBots?.find((item) => item._id === id);
         if (findBot) {
           socket.emit('requestStop', findBot);
         }
@@ -124,7 +124,7 @@ $(document).ready(function () {
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        const findBot = dataBots.find((item) => item._id === id);
+        const findBot = dataBots?.find((item) => item._id === id);
         if (findBot) {
           socket.emit('requestRestart', findBot);
         }
@@ -148,7 +148,7 @@ $(document).ready(function () {
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        const findBot = dataBots.find((item) => item._id === id);
+        const findBot = dataBots?.find((item) => item._id === id);
         if (findBot) {
           socket.emit('requestReboot', findBot);
         }
@@ -209,7 +209,7 @@ $(document).ready(function () {
     if (filter === 'all') {
       loadBots(dataBots);
     } else {
-      const filtered = dataBots.filter((item) => item.keyName === filter);
+      const filtered = dataBots?.filter((item) => item.keyName === filter);
       loadBots(filtered);
     }
   });
@@ -220,7 +220,7 @@ $(document).ready(function () {
     if (filter === 'all') {
       loadBots(dataBots);
     } else {
-      const filtered = dataBots.filter((item) => item.isActive === term);
+      const filtered = dataBots?.filter((item) => item.isActive === term);
       loadBots(filtered);
     }
   });
