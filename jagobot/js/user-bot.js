@@ -54,29 +54,31 @@ $(document).ready(function () {
 
       /** Update Views */
       const elementBot = $('#bot-' + bot._id);
-      if (bot.isActive) {
-        animateChange(elementBot.find('.totalHitsPerDay'), oldBot.totalHitsPerDay, bot.totalHitsPerDay);
-        animateChange(elementBot.find('.totalClickAdsPerDay'), oldBot.totalClickAdsPerDay, bot.totalClickAdsPerDay);
-        animateChange(elementBot.find('.totalViewAdsPerDay'), oldBot.totalViewAdsPerDay, bot.totalViewAdsPerDay);
-        animateChange(elementBot.find('.totalErrorPerDay'), oldBot.totalErrorPerDay, bot.totalErrorPerDay);
-        elementBot.find('.lastActivity').html(moment(bot.lastActivity).fromNow());
-        elementListBots.prepend(elementBot);
-      } else {
-        elementListBots.append(elementBot);
-        toastr.warning('Bot ' + bot.ip + ' is currently inactive', 'Bot not active!');
-      }
+      if (elementBot) {
+        if (bot.isActive) {
+          animateChange(elementBot.find('.totalHitsPerDay'), oldBot.totalHitsPerDay, bot.totalHitsPerDay);
+          animateChange(elementBot.find('.totalClickAdsPerDay'), oldBot.totalClickAdsPerDay, bot.totalClickAdsPerDay);
+          animateChange(elementBot.find('.totalViewAdsPerDay'), oldBot.totalViewAdsPerDay, bot.totalViewAdsPerDay);
+          animateChange(elementBot.find('.totalErrorPerDay'), oldBot.totalErrorPerDay, bot.totalErrorPerDay);
+          elementBot.find('.lastActivity').html(moment(bot.lastActivity).fromNow());
+        } else {
+          elementListBots.append(elementBot);
+          toastr.warning('Bot ' + bot.ip + ' is currently inactive', 'Bot not active!');
+        }
 
-      elementBot.find('.bot-status').html(setIsActive(bot));
-      elementBot.find('.bot-stop').html(setIsPaused(bot));
-      setUptime(bot);
+        elementBot.find('.bot-status').html(setIsActive(bot));
+        elementBot.find('.bot-stop').html(setIsPaused(bot));
+        setUptime(bot);
+      }
     }
   });
 
   socket.on('clientSystemStats', (data) => {
     const elementBot = $('#bot-' + data.id);
-    elementListBots.prepend(elementBot);
-    elementBot.find('.cpu').text(data.cpuUsage + '%');
-    elementBot.find('.memory').text(data.usedMem + '%');
+    if (elementBot) {
+      elementBot.find('.cpu').text(data.cpuUsage + '%');
+      elementBot.find('.memory').text(data.usedMem + '%');
+    }
   });
 
   socket.on('clientMessage', (data) => {
@@ -87,25 +89,25 @@ $(document).ready(function () {
   /** Request Stop bot  */
   $(document).on('click', '.bot-stop', function () {
     const id = $(this).data('id');
-    Swal.fire({
-      title: 'Stop Bot',
-      text: 'Are you sure you want to stop this bot?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes',
-      customClass: {
-        confirmButton: 'btn btn-primary waves-effect waves-light',
-        cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light',
-      },
-      buttonsStyling: false,
-    }).then(function (result) {
-      if (result.value) {
-        const findBot = dataBots?.find((item) => item._id === id);
-        if (findBot) {
+    const findBot = dataBots?.find((item) => item._id === id);
+    if (findBot) {
+      Swal.fire({
+        title: findBot.isStarted ? 'Stop Bot' : 'Run Bot',
+        text: findBot.isStarted ? 'Are you sure you want to stop this bot?' : 'Are you sure you want to run this bot?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        customClass: {
+          confirmButton: 'btn btn-primary waves-effect waves-light',
+          cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light',
+        },
+        buttonsStyling: false,
+      }).then(function (result) {
+        if (result.value) {
           socket.emit('requestStop', findBot);
         }
-      }
-    });
+      });
+    }
   });
 
   /** Request Restart bot  */
