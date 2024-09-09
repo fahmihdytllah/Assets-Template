@@ -77,7 +77,7 @@ $(document).ready(function () {
     const elementBot = $('#bot-' + data.id);
     if (elementBot) {
       elementBot.find('.cpu').text(data.cpuUsage + '%');
-      elementBot.find('.memory').text(data.usedMem + '%');
+      elementBot.find('.memory').text(data.memoryUsage + '%');
     }
   });
 
