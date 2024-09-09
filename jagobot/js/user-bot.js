@@ -74,7 +74,7 @@ $(document).ready(function () {
   });
 
   socket.on('clientSystemStats', (data) => {
-    const elementBot = $('#bot-' + data.id);
+    const elementBot = $('#bot-' + data._id);
     if (elementBot) {
       elementBot.find('.cpu').text(data.cpuUsage + '%');
       elementBot.find('.memory').text(data.memoryUsage + '%');
