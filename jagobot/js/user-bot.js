@@ -1,12 +1,12 @@
 $(document).ready(function () {
   let elementListBots = $('#listBots'),
     socket = io(),
-    dataBots = [],
+    localDataBot = [],
     showBots = {},
     uptimeBots = {},
     uptimeSeconds = {};
 
-  graphDataBots();
+  graphDataBot();
 
   /** Socket server */
   setTimeout(() => {
@@ -18,7 +18,7 @@ $(document).ready(function () {
   });
 
   socket.on('clientConnected', (bot) => {
-    const findBot = dataBots?.find((q) => q._id === bot._id);
+    const findBot = localDataBot?.find((q) => q._id === bot._id);
     if (findBot) {
       if (!findBot.isActive) {
         toastr.success('Bot ' + bot.ip + ' is active again', 'Bot is active again!');
@@ -29,7 +29,7 @@ $(document).ready(function () {
       elementBot.find('.bot-status').html(setIsActive(bot));
       elementBot.find('.bot-stop').html(setIsPaused(bot));
     } else {
-      dataBots.push(bot);
+      localDataBot.push(bot);
       elementListBots.prepend(paternBot(bot));
       toastr.success('New bots have been added: ' + bot.ip, 'New bot added!');
     }
@@ -37,20 +37,20 @@ $(document).ready(function () {
 
   socket.on('stopedBot', (bot) => {
     /** Update local array */
-    const indexBot = dataBots?.findIndex((item) => item._id === bot._id);
+    const indexBot = localDataBot?.findIndex((item) => item._id === bot._id);
     if (indexBot !== -1) {
-      dataBots[indexBot] = { ...dataBots[indexBot], ...bot };
+      localDataBot[indexBot] = { ...localDataBot[indexBot], ...bot };
       const elementBot = $('#bot-' + bot._id);
       elementBot.find('.bot-stop').html(setIsPaused(bot));
     }
   });
 
   socket.on('updatedBot', (bot) => {
-    const indexBot = dataBots?.findIndex((item) => item._id === bot._id);
+    const indexBot = localDataBot?.findIndex((item) => item._id === bot._id);
     if (indexBot !== -1) {
       /** Update local array */
-      const oldBot = dataBots[indexBot];
-      dataBots[indexBot] = { ...dataBots[indexBot], ...bot };
+      const oldBot = localDataBot[indexBot];
+      localDataBot[indexBot] = { ...localDataBot[indexBot], ...bot };
 
       /** Update Views */
       const elementBot = $('#bot-' + bot._id);
@@ -89,7 +89,7 @@ $(document).ready(function () {
   /** Request Stop bot  */
   $(document).on('click', '.bot-stop', function () {
     const id = $(this).data('id');
-    const findBot = dataBots?.find((item) => item._id === id);
+    const findBot = localDataBot?.find((item) => item._id === id);
     if (findBot) {
       Swal.fire({
         title: findBot.isStarted ? 'Stop Bot' : 'Run Bot',
@@ -126,7 +126,7 @@ $(document).ready(function () {
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        const findBot = dataBots?.find((item) => item._id === id);
+        const findBot = localDataBot?.find((item) => item._id === id);
         if (findBot) {
           socket.emit('requestRestart', findBot);
         }
@@ -150,7 +150,7 @@ $(document).ready(function () {
       buttonsStyling: false,
     }).then(function (result) {
       if (result.value) {
-        const findBot = dataBots?.find((item) => item._id === id);
+        const findBot = localDataBot?.find((item) => item._id === id);
         if (findBot) {
           socket.emit('requestReboot', findBot);
         }
@@ -202,16 +202,16 @@ $(document).ready(function () {
   $('.search-bot').on('input', function () {
     const searchTerm = $(this).val();
     $('#loadingBots').show();
-    const results = searchArray(dataBots, searchTerm);
+    const results = searchArray(localDataBot, searchTerm);
     loadBots(results);
   });
 
   $('#filter-key').change(function () {
     const filter = $(this).val();
     if (filter === 'all') {
-      loadBots(dataBots);
+      loadBots(localDataBot);
     } else {
-      const filtered = dataBots?.filter((item) => item.keyName === filter);
+      const filtered = localDataBot?.filter((item) => item.keyName === filter);
       loadBots(filtered);
     }
   });
@@ -220,20 +220,20 @@ $(document).ready(function () {
     const filter = $(this).val();
     const term = filter === 'online' ? true : false;
     if (filter === 'all') {
-      loadBots(dataBots);
+      loadBots(localDataBot);
     } else {
-      const filtered = dataBots?.filter((item) => item.isActive === term);
+      const filtered = localDataBot?.filter((item) => item.isActive === term);
       loadBots(filtered);
     }
   });
 
-  function graphDataBots() {
+  function graphDataBot() {
     $('#loadingBots').show();
 
     $.get('?type=json', function (res) {
       $('#loadingBots').hide();
-      dataBots = res.data;
-      loadBots(dataBots);
+      localDataBot = res.data;
+      loadBots(localDataBot);
     });
   }
 
@@ -297,20 +297,24 @@ $(document).ready(function () {
         <div class="collapse mt-3 ${showBots[bot._id] ? '' : 'show'}" id="detail-${bot._id}">
           <ul class="list-unstyled row">
             <div class="col-4">
-              <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="CPU Usage"><i class="ti ti-cpu ti-sm "></i><span class="text-muted mx-2 cpu">0 %</span></li>
+              <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="CPU Usage"><i class="ti ti-cpu ti-sm "></i><span class="text-muted mx-2 cpu">${
+                bot.cpuUsage
+              }%</span></li>
               <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Visitors"><i class="ti ti-users ti-sm "></i><span class="text-muted mx-2 totalHitsPerDay">${bot.totalHitsPerDay.toLocaleString()}</span></li>
               <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Ad Views"><i class="ti ti-ad ti-sm "></i><span class="text-muted mx-2 totalViewAdsPerDay">${bot.totalViewAdsPerDay.toLocaleString()}</span></li>
               <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Ad Clicks"><i class="ti ti-click ti-sm "></i><span class="text-muted mx-2 totalClickAdsPerDay">${bot.totalClickAdsPerDay.toLocaleString()}</span></li>
               <li class="d-flex align-items-center" data-type="tooltip" data-text="Errors"><i class="ti ti-exclamation-circle ti-sm "></i><span class="text-muted mx-2 totalErrorPerDay">${bot.totalErrorPerDay.toLocaleString()}</span></li>
             </div>
             <div class="col-8">
-              <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Memory Usage"><i class="ti ti-server ti-sm "></i><span class="text-muted mx-2 memory">0 %</span></li>
+              <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Memory Usage"><i class="ti ti-server ti-sm "></i><span class="text-muted mx-2 memory">${
+                bot.memoryUsage
+              }%</span></li>
               <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Access Key"><i class="ti ti-key ti-sm "></i><span class="text-muted mx-2 key">${
                 bot.keyName
               }</span></li>
-              <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Uptime"><i class="ti ti-clock ti-sm "></i><span class="text-muted mx-2 uptime">${
-                bot.uptime?.includes(' h ') ? bot.uptime : formatTime(bot.uptime)
-              }</span></li>
+              <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Uptime"><i class="ti ti-clock ti-sm "></i><span class="text-muted mx-2 uptime">${formatTime(
+                bot.uptime
+              )}</span></li>
               <li class="d-flex align-items-center mb-2" data-type="tooltip" data-text="Last Activity"><i class="ti ti-activity ti-sm "></i><span class="text-muted mx-2 lastActivity">${moment(
                 bot.lastActivity
               ).fromNow()}</span></li>
@@ -337,6 +341,12 @@ $(document).ready(function () {
       success: function (res) {
         $.unblockUI();
         $('#bot-' + id).remove();
+
+        const indexBot = localDataBot.findIndex(({ id }) => id === id);
+        if (indexBot !== -1) {
+          localDataBot.splice(indexBot, 1);
+        }
+
         toastr.success(res.msg, 'Good Job!');
       },
       error: function (e) {
@@ -373,7 +383,7 @@ $(document).ready(function () {
 
   function animateChange(element, startValue, finalValue) {
     const difference = Math.abs(finalValue - startValue);
-    const duration = difference * 100;
+    const duration = difference * 50;
     const startTime = performance.now();
 
     function updateNumber(currentTime) {
@@ -400,11 +410,7 @@ $(document).ready(function () {
   function setUptime(bot) {
     if (bot.isActive) {
       if (uptimeSeconds[bot._id] === undefined) {
-        if (bot.uptime?.includes(' h ')) {
-          uptimeSeconds[bot._id] = convertToSeconds(bot.uptime);
-        } else {
-          uptimeSeconds[bot._id] = parseInt(bot.uptime);
-        }
+        uptimeSeconds[bot._id] = parseFloat(bot.uptime);
       }
 
       if (uptimeBots[bot._id] !== undefined) {
