@@ -1,10 +1,22 @@
 $(document).ready(function () {
-  let elementListBots = $('#listBots'),
+  let select2 = $('.select2'),
+    elementListBots = $('#listBots'),
     socket = io(),
     localDataBot = [],
     showBots = {},
     uptimeBots = {},
     uptimeSeconds = {};
+
+  /** Select Default */
+  if (select2.length) {
+    select2.each(function () {
+      var $this = $(this);
+      $this.wrap('<div class="position-relative"></div>').select2({
+        placeholder: 'Select value',
+        dropdownParent: $this.parent(),
+      });
+    });
+  }
 
   graphDataBot();
 
@@ -74,10 +86,17 @@ $(document).ready(function () {
   });
 
   socket.on('clientSystemStats', (data) => {
-    const elementBot = $('#bot-' + data._id);
-    if (elementBot) {
-      elementBot.find('.cpu').text(data.cpuUsage + '%');
-      elementBot.find('.memory').text(data.memoryUsage + '%');
+    const indexBot = localDataBot?.findIndex((item) => item._id === bot._id);
+    if (indexBot !== -1) {
+      /** Update local array */
+      localDataBot[indexBot] = { ...localDataBot[indexBot], ...bot };
+
+      /** Update Views */
+      const elementBot = $('#bot-' + data._id);
+      if (elementBot) {
+        elementBot.find('.cpu').text(data.cpuUsage + '%');
+        elementBot.find('.memory').text(data.memoryUsage + '%');
+      }
     }
   });
 
@@ -198,7 +217,7 @@ $(document).ready(function () {
     showBots[id] = !showBots[id];
   });
 
-  /** Search % filtered bot */
+  /** Search bot */
   $('.search-bot').on('input', function () {
     const searchTerm = $(this).val();
     $('#loadingBots').show();
@@ -206,25 +225,34 @@ $(document).ready(function () {
     loadBots(results);
   });
 
-  $('#filter-key').change(function () {
-    const filter = $(this).val();
-    if (filter === 'all') {
-      loadBots(localDataBot);
-    } else {
-      const filtered = localDataBot?.filter((item) => item.keyName === filter);
-      loadBots(filtered);
-    }
-  });
+  /** Filtered bot */
+  $('#filtered').change(function () {
+    let term = $(this).val();
+    let type = $(this).find('option:selected').data('type');
+    let filteredData = [];
 
-  $('#filter-bot').change(function () {
-    const filter = $(this).val();
-    const term = filter === 'online' ? true : false;
-    if (filter === 'all') {
-      loadBots(localDataBot);
+    /** Filtered data */
+    if (type === 'byKey') {
+      filteredData = localDataBot?.filter((item) => item.keyName === term);
+    } else if (type === 'byActive') {
+      term = term === 'online' ? true : false;
+      filteredData = localDataBot?.filter((item) => item.isActive === term);
+    } else if (type === 'byStats') {
+      filteredData = localDataBot?.sort(function (a, b) {
+        return b[term] - a[term];
+      });
+    } else if (type === 'byCountry') {
+      filteredData = localDataBot?.sort(function (a, b) {
+        let countryA = a.country.toLowerCase();
+        let countryB = b.country.toLowerCase();
+        return countryA.localeCompare(countryB);
+      });
     } else {
-      const filtered = localDataBot?.filter((item) => item.isActive === term);
-      loadBots(filtered);
+      filteredData = localDataBot;
     }
+
+    /** Display data */
+    loadBots(filteredData);
   });
 
   function graphDataBot() {
@@ -234,6 +262,10 @@ $(document).ready(function () {
       $('#loadingBots').hide();
       localDataBot = res.data;
       loadBots(localDataBot);
+
+      /** Display Catgory total */
+      let categoryTotals = getCategoryTotals(localDataBot);
+      populateCategoryFilter(categoryTotals);
     });
   }
 
@@ -434,20 +466,32 @@ $(document).ready(function () {
     return `${hrs}h ${mins}m ${secs}s`;
   }
 
-  function convertToSeconds(timeString) {
-    const timeRegex = /(\d+)\s*(h|m|s)/g;
-    let totalSeconds = 0;
-    let match;
+  function getCategoryTotals(items) {
+    let categoryTotals = {};
 
-    while ((match = timeRegex.exec(timeString)) !== null) {
-      const value = parseInt(match[1]);
-      const unit = match[2];
+    items.forEach(function (item) {
+      if (categoryTotals[item.keyName]) {
+        categoryTotals[item.keyName]++;
+      } else {
+        categoryTotals[item.keyName] = 1;
+      }
+    });
 
-      if (unit === 'h') totalSeconds += value * 3600;
-      else if (unit === 'm') totalSeconds += value * 60;
-      else if (unit === 's') totalSeconds += value;
+    return categoryTotals;
+  }
+
+  function populateCategoryFilter(categoryTotals) {
+    let $select = $('#byKey');
+    for (let category in categoryTotals) {
+      $select.append(
+        '<option value="' +
+          category +
+          '" data-type="byKey">' +
+          category +
+          ' (' +
+          categoryTotals[category] +
+          ') </option>'
+      );
     }
-
-    return totalSeconds;
   }
 });
