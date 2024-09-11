@@ -85,17 +85,17 @@ $(document).ready(function () {
     }
   });
 
-  socket.on('clientSystemStats', (data) => {
+  socket.on('clientSystemStats', (bot) => {
     const indexBot = localDataBot?.findIndex((item) => item._id === bot._id);
     if (indexBot !== -1) {
       /** Update local array */
       localDataBot[indexBot] = { ...localDataBot[indexBot], ...bot };
 
       /** Update Views */
-      const elementBot = $('#bot-' + data._id);
+      const elementBot = $('#bot-' + bot._id);
       if (elementBot) {
-        elementBot.find('.cpu').text(data.cpuUsage + '%');
-        elementBot.find('.memory').text(data.memoryUsage + '%');
+        elementBot.find('.cpu').text(bot.cpuUsage + '%');
+        elementBot.find('.memory').text(bot.memoryUsage + '%');
       }
     }
   });
