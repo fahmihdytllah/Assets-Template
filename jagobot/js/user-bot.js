@@ -1,7 +1,7 @@
 $(document).ready(function () {
   let select2 = $('.select2'),
     elementListBots = $('#listBots'),
-    socket = io(),
+    socket = io('/users'),
     localDataBot = [],
     showBots = {},
     uptimeBots = {},
