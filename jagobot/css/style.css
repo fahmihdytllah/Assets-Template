@@ -22,7 +22,8 @@
   height: 34px;
 }
 
-.app-brand-logo.demo svg, .app-brand-logo.demo img {
+.app-brand-logo.demo svg,
+.app-brand-logo.demo img {
   width: 34px;
   height: 34px;
 }
@@ -131,4 +132,21 @@
 .layout-demo-info {
   text-align: center;
   margin-top: 1rem;
+}
+
+.goog-te-banner-frame,
+.skiptranslate,
+img.goog-te-gadget-icon,
+.goog-te-menu-value span,
+.goog-te-menu-frame,
+#goog-gt-tt,
+#google_translate_element {
+  display: none !important;
+}
+.goog-text-highlight {
+  background-color: var(--themeBg) !important;
+  box-shadow: none !important;
+}
+body {
+  top: 0 !important;
 }

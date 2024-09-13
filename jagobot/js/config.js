@@ -24,7 +24,7 @@ window.config = {
     bodyColor: '#6f6b7d',
     headingColor: '#5d596c',
     textMuted: '#a5a3ae',
-    borderColor: '#dbdade'
+    borderColor: '#dbdade',
   },
   colors_label: {
     primary: '#7367f029',
@@ -33,7 +33,7 @@ window.config = {
     info: '#00cfe829',
     warning: '#ff9f4329',
     danger: '#ea545529',
-    dark: '#4b4b4b29'
+    dark: '#4b4b4b29',
   },
   colors_dark: {
     cardColor: '#2f3349',
@@ -41,15 +41,16 @@ window.config = {
     bodyColor: '#b6bee3',
     headingColor: '#cfd3ec',
     textMuted: '#7983bb',
-    borderColor: '#434968'
+    borderColor: '#434968',
   },
-  enableMenuLocalStorage: true // Enable menu state with local storage support
+  enableMenuLocalStorage: true, // Enable menu state with local storage support
 };
 
 window.assetsPath = document.documentElement.getAttribute('data-assets-path');
 window.templateName = document.documentElement.getAttribute('data-template');
 window.rtlSupport = true; // set true for rtl support (rtl + ltr), false for ltr only.
-window.itemLoader = '<div class="d-flex justify-content-center"><div class="sk-swing sk-primary"><div class="sk-swing-dot"></div><div class="sk-swing-dot"></div></div></div>';
+window.itemLoader =
+  '<div class="d-flex justify-content-center"><div class="sk-swing sk-primary"><div class="sk-swing-dot"></div><div class="sk-swing-dot"></div></div></div>';
 
 /**
  * TemplateCustomizer
@@ -59,10 +60,10 @@ window.itemLoader = '<div class="d-flex justify-content-center"><div class="sk-s
 
 // To use more themes, just push it to THEMES object.
 
-/* TemplateCustomizer.THEMES.push({
+TemplateCustomizer.THEMES.push({
   name: 'theme-raspberry',
-  title: 'Raspberry'
-}); */
+  title: 'Raspberry',
+});
 
 // To add more languages, just push it to LANGUAGES object.
 /*
@@ -93,7 +94,7 @@ if (typeof TemplateCustomizer !== 'undefined') {
     cssPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
     themesPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
     displayCustomizer: true,
-    // lang: localStorage.getItem('templateCustomizer-' + templateName + '--Lang') || 'en', // Set default language here
+    lang: localStorage.getItem('templateCustomizer-' + templateName + '--Lang') || 'en', // Set default language here
     // defaultTheme: 2,
     // defaultStyle: 'system',
     // defaultTextDir: 'rtl',
@@ -103,6 +104,6 @@ if (typeof TemplateCustomizer !== 'undefined') {
     // defaultNavbarType: 'sticky',
     // defaultFooterFixed: true,
     // defaultShowDropdownOnHover: false,
-    controls: ['rtl', 'style', 'headerType', 'contentLayout', 'layoutCollapsed', 'layoutNavbarOptions', 'themes']
+    controls: ['rtl', 'style', 'headerType', 'contentLayout', 'layoutCollapsed', 'layoutNavbarOptions', 'themes'],
   });
 }

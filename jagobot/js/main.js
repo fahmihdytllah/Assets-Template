@@ -40,7 +40,7 @@ if (document.getElementById('layout-menu')) {
         ? localStorage.getItem('templateCustomizer-' + templateName + '--ShowDropdownOnHover') === 'true' // Use the local storage value
         : window.templateCustomizer !== undefined // If value is set in config.js
         ? window.templateCustomizer.settings.defaultShowDropdownOnHover // Use the config.js value
-        : true // Use this if you are not using the config.js and want to set value directly from here
+        : true, // Use this if you are not using the config.js and want to set value directly from here
     });
     // Change parameter to true if you want scroll animation
     window.Helpers.scrollToActive((animate = false));
@@ -49,14 +49,17 @@ if (document.getElementById('layout-menu')) {
 
   // Initialize menu togglers and bind click on each
   let menuToggler = document.querySelectorAll('.layout-menu-toggle');
-  menuToggler.forEach(item => {
-    item.addEventListener('click', event => {
+  menuToggler.forEach((item) => {
+    item.addEventListener('click', (event) => {
       event.preventDefault();
       window.Helpers.toggleCollapsed();
       // Enable menu state with local storage support if enableMenuLocalStorage = true from config.js
       if (config.enableMenuLocalStorage && !window.Helpers.isSmallScreen()) {
         try {
-          localStorage.setItem('templateCustomizer-' + templateName + '--LayoutCollapsed', String(window.Helpers.isCollapsed()));
+          localStorage.setItem(
+            'templateCustomizer-' + templateName + '--LayoutCollapsed',
+            String(window.Helpers.isCollapsed())
+          );
           // Update customizer checkbox state on click of menu toggler
           let layoutCollapsedCustomizerOptions = document.querySelector('.template-customizer-layouts-options');
           if (layoutCollapsedCustomizerOptions) {
@@ -141,19 +144,19 @@ if (document.getElementById('layout-menu')) {
       styleSwitcherIcon.classList.add('ti-sun');
       new bootstrap.Tooltip(styleSwitcherIcon, {
         title: 'Light Mode',
-        fallbackPlacements: ['bottom']
+        fallbackPlacements: ['bottom'],
       });
     } else if (storedStyle === 'dark') {
       styleSwitcherIcon.classList.add('ti-moon');
       new bootstrap.Tooltip(styleSwitcherIcon, {
         title: 'Dark Mode',
-        fallbackPlacements: ['bottom']
+        fallbackPlacements: ['bottom'],
       });
     } else {
       styleSwitcherIcon.classList.add('ti-device-desktop');
       new bootstrap.Tooltip(styleSwitcherIcon, {
         title: 'System Mode',
-        fallbackPlacements: ['bottom']
+        fallbackPlacements: ['bottom'],
       });
     }
   }
@@ -164,76 +167,79 @@ if (document.getElementById('layout-menu')) {
   // Internationalization (Language Dropdown)
   // ---------------------------------------
 
-  if (typeof i18next !== 'undefined' && typeof i18NextHttpBackend !== 'undefined') {
-    // i18next
-    //   .use(i18NextHttpBackend)
-    //   .init({
-    //     lng: window.templateCustomizer ? window.templateCustomizer.settings.lang : 'en',
-    //     debug: false,
-    //     fallbackLng: 'en',
-    //     backend: {
-    //       loadPath: assetsPath + 'json/locales/{{lng}}.json'
-    //     },
-    //     returnObjects: true
-    //   })
-    //   .then(function (t) {
-    //     localize();
-    //   });
-  }
+  // if (typeof i18next !== 'undefined' && typeof i18NextHttpBackend !== 'undefined') {
+  //   i18next
+  //     .use(i18NextHttpBackend)
+  //     .init({
+  //       lng: window.templateCustomizer ? window.templateCustomizer.settings.lang : 'en',
+  //       debug: false,
+  //       fallbackLng: 'en',
+  //       backend: {
+  //         loadPath: assetsPath + 'json/locales/{{lng}}.json'
+  //       },
+  //       returnObjects: true
+  //     })
+  //     .then(function (t) {
+  //       localize();
+  //     });
+  // }
 
-  let languageDropdown = document.getElementsByClassName('dropdown-language');
+  // let languageDropdown = document.getElementsByClassName('dropdown-language');
 
-  if (languageDropdown.length) {
-    let dropdownItems = languageDropdown[0].querySelectorAll('.dropdown-item');
+  // if (languageDropdown.length) {
+  //   let dropdownItems = languageDropdown[0].querySelectorAll('.dropdown-item');
 
-    for (let i = 0; i < dropdownItems.length; i++) {
-      dropdownItems[i].addEventListener('click', function () {
-        let currentLanguage = this.getAttribute('data-language');
-        let textDirection = this.getAttribute('data-text-direction');
+  //   for (let i = 0; i < dropdownItems.length; i++) {
+  //     dropdownItems[i].addEventListener('click', function () {
+  //       let currentLanguage = this.getAttribute('data-language');
+  //       let textDirection = this.getAttribute('data-text-direction');
 
-        for (let sibling of this.parentNode.children) {
-          var siblingEle = sibling.parentElement.parentNode.firstChild;
+  //       for (let sibling of this.parentNode.children) {
+  //         var siblingEle = sibling.parentElement.parentNode.firstChild;
 
-          // Loop through each sibling and push to the array
-          while (siblingEle) {
-            if (siblingEle.nodeType === 1 && siblingEle !== siblingEle.parentElement) {
-              siblingEle.querySelector('.dropdown-item').classList.remove('active');
-            }
-            siblingEle = siblingEle.nextSibling;
-          }
-        }
-        this.classList.add('active');
+  //         // Loop through each sibling and push to the array
+  //         while (siblingEle) {
+  //           if (siblingEle.nodeType === 1 && siblingEle !== siblingEle.parentElement) {
+  //             siblingEle.querySelector('.dropdown-item').classList.remove('active');
+  //           }
+  //           siblingEle = siblingEle.nextSibling;
+  //         }
+  //       }
+  //       this.classList.add('active');
 
-        i18next.changeLanguage(currentLanguage, (err, t) => {
-          window.templateCustomizer ? window.templateCustomizer.setLang(currentLanguage) : '';
-          directionChange(textDirection);
-          if (err) return console.log('something went wrong loading', err);
-          localize();
-        });
-      });
-    }
-    function directionChange(textDirection) {
-      if (textDirection === 'rtl') {
-        if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') !== 'true') window.templateCustomizer ? window.templateCustomizer.setRtl(true) : '';
-      } else {
-        if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') === 'true') window.templateCustomizer ? window.templateCustomizer.setRtl(false) : '';
-      }
-    }
-  }
+  //       i18next.changeLanguage(currentLanguage, (err, t) => {
+  //         window.templateCustomizer ? window.templateCustomizer.setLang(currentLanguage) : '';
+  //         directionChange(textDirection);
+  //         if (err) return console.log('something went wrong loading', err);
+  //         localize();
+  //       });
+  //     });
+  //   }
 
-  function localize() {
-    let i18nList = document.querySelectorAll('[data-i18n]');
-    // Set the current language in dd
-    let currentLanguageEle = document.querySelector('.dropdown-item[data-language="' + i18next.language + '"]');
+  //   function directionChange(textDirection) {
+  //     if (textDirection === 'rtl') {
+  //       if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') !== 'true')
+  //         window.templateCustomizer ? window.templateCustomizer.setRtl(true) : '';
+  //     } else {
+  //       if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') === 'true')
+  //         window.templateCustomizer ? window.templateCustomizer.setRtl(false) : '';
+  //     }
+  //   }
+  // }
 
-    if (currentLanguageEle) {
-      currentLanguageEle.click();
-    }
+  // function localize() {
+  //   let i18nList = document.querySelectorAll('[data-i18n]');
+  //   // Set the current language in dd
+  //   let currentLanguageEle = document.querySelector('.dropdown-item[data-language="' + i18next.language + '"]');
 
-    i18nList.forEach(function (item) {
-      item.innerHTML = i18next.t(item.dataset.i18n);
-    });
-  }
+  //   if (currentLanguageEle) {
+  //     currentLanguageEle.click();
+  //   }
+
+  //   i18nList.forEach(function (item) {
+  //     item.innerHTML = i18next.t(item.dataset.i18n);
+  //   });
+  // }
 
   // Notification
   // ------------
@@ -242,16 +248,16 @@ if (document.getElementById('layout-menu')) {
 
   // Notification: Mark as all as read
   if (notificationMarkAsReadAll) {
-    notificationMarkAsReadAll.addEventListener('click', event => {
-      notificationMarkAsReadList.forEach(item => {
+    notificationMarkAsReadAll.addEventListener('click', (event) => {
+      notificationMarkAsReadList.forEach((item) => {
         item.closest('.dropdown-notifications-item').classList.add('marked-as-read');
       });
     });
   }
   // Notification: Mark as read/unread onclick of dot
   if (notificationMarkAsReadList) {
-    notificationMarkAsReadList.forEach(item => {
-      item.addEventListener('click', event => {
+    notificationMarkAsReadList.forEach((item) => {
+      item.addEventListener('click', (event) => {
         item.closest('.dropdown-notifications-item').classList.toggle('marked-as-read');
       });
     });
@@ -259,8 +265,8 @@ if (document.getElementById('layout-menu')) {
 
   // Notification: Mark as read/unread onclick of dot
   const notificationArchiveMessageList = document.querySelectorAll('.dropdown-notifications-archive');
-  notificationArchiveMessageList.forEach(item => {
-    item.addEventListener('click', event => {
+  notificationArchiveMessageList.forEach((item) => {
+    item.addEventListener('click', (event) => {
       item.closest('.dropdown-notifications-item').remove();
     });
   });
@@ -379,7 +385,11 @@ if (document.getElementById('layout-menu')) {
   if (typeof config !== 'undefined') {
     if (config.enableMenuLocalStorage) {
       try {
-        if (localStorage.getItem('templateCustomizer-' + templateName + '--LayoutCollapsed') !== null) window.Helpers.setCollapsed(localStorage.getItem('templateCustomizer-' + templateName + '--LayoutCollapsed') === 'true', false);
+        if (localStorage.getItem('templateCustomizer-' + templateName + '--LayoutCollapsed') !== null)
+          window.Helpers.setCollapsed(
+            localStorage.getItem('templateCustomizer-' + templateName + '--LayoutCollapsed') === 'true',
+            false
+          );
       } catch (e) {}
     }
   }
@@ -438,7 +448,8 @@ if (typeof $ !== 'undefined') {
       });
     }, 10);
 
-    if (false) { // searchInput.length
+    if (false) {
+      // searchInput.length
       // Filter config
       var filterConfig = function (data) {
         return function findMatches(q, cb) {
@@ -447,7 +458,10 @@ if (typeof $ !== 'undefined') {
           data.filter(function (i) {
             if (i.name.toLowerCase().startsWith(q.toLowerCase())) {
               matches.push(i);
-            } else if (!i.name.toLowerCase().startsWith(q.toLowerCase()) && i.name.toLowerCase().includes(q.toLowerCase())) {
+            } else if (
+              !i.name.toLowerCase().startsWith(q.toLowerCase()) &&
+              i.name.toLowerCase().includes(q.toLowerCase())
+            ) {
               matches.push(i);
               matches.sort(function (a, b) {
                 return b.name < a.name ? 1 : -1;
@@ -469,7 +483,7 @@ if (typeof $ !== 'undefined') {
       var searchData = $.ajax({
         url: assetsPath + 'json/' + searchJson, //? Use your own search api instead
         dataType: 'json',
-        async: false
+        async: false,
       }).responseJSON;
       // Init typeahead on searchInput
       searchInput.each(function () {
@@ -481,8 +495,8 @@ if (typeof $ !== 'undefined') {
               classNames: {
                 menu: 'tt-menu navbar-search-suggestion',
                 cursor: 'active',
-                suggestion: 'suggestion d-flex justify-content-between px-3 py-2 w-100'
-              }
+                suggestion: 'suggestion d-flex justify-content-between px-3 py-2 w-100',
+              },
             },
             // ? Add/Update blocks as per need
             // Pages
@@ -494,10 +508,27 @@ if (typeof $ !== 'undefined') {
               templates: {
                 header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Pages</h6>',
                 suggestion: function ({ url, icon, name }) {
-                  return '<a href="' + url + '">' + '<div>' + '<i class="ti ' + icon + ' me-2"></i>' + '<span class="align-middle">' + name + '</span>' + '</div>' + '</a>';
+                  return (
+                    '<a href="' +
+                    url +
+                    '">' +
+                    '<div>' +
+                    '<i class="ti ' +
+                    icon +
+                    ' me-2"></i>' +
+                    '<span class="align-middle">' +
+                    name +
+                    '</span>' +
+                    '</div>' +
+                    '</a>'
+                  );
                 },
-                notFound: '<div class="not-found px-3 py-2">' + '<h6 class="suggestions-header text-primary mb-2">Pages</h6>' + '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' + '</div>'
-              }
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Pages</h6>' +
+                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
+                  '</div>',
+              },
             },
             // Files
             {
@@ -508,10 +539,36 @@ if (typeof $ !== 'undefined') {
               templates: {
                 header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Files</h6>',
                 suggestion: function ({ src, name, subtitle, meta }) {
-                  return '<a href="javascript:;">' + '<div class="d-flex w-50">' + '<img class="me-3" src="' + assetsPath + src + '" alt="' + name + '" height="32">' + '<div class="w-75">' + '<h6 class="mb-0">' + name + '</h6>' + '<small class="text-muted">' + subtitle + '</small>' + '</div>' + '</div>' + '<small class="text-muted">' + meta + '</small>' + '</a>';
+                  return (
+                    '<a href="javascript:;">' +
+                    '<div class="d-flex w-50">' +
+                    '<img class="me-3" src="' +
+                    assetsPath +
+                    src +
+                    '" alt="' +
+                    name +
+                    '" height="32">' +
+                    '<div class="w-75">' +
+                    '<h6 class="mb-0">' +
+                    name +
+                    '</h6>' +
+                    '<small class="text-muted">' +
+                    subtitle +
+                    '</small>' +
+                    '</div>' +
+                    '</div>' +
+                    '<small class="text-muted">' +
+                    meta +
+                    '</small>' +
+                    '</a>'
+                  );
                 },
-                notFound: '<div class="not-found px-3 py-2">' + '<h6 class="suggestions-header text-primary mb-2">Files</h6>' + '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' + '</div>'
-              }
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Files</h6>' +
+                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
+                  '</div>',
+              },
             },
             // Members
             {
@@ -522,10 +579,33 @@ if (typeof $ !== 'undefined') {
               templates: {
                 header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Members</h6>',
                 suggestion: function ({ name, src, subtitle }) {
-                  return '<a href="app-user-view-account.html">' + '<div class="d-flex align-items-center">' + '<img class="rounded-circle me-3" src="' + assetsPath + src + '" alt="' + name + '" height="32">' + '<div class="user-info">' + '<h6 class="mb-0">' + name + '</h6>' + '<small class="text-muted">' + subtitle + '</small>' + '</div>' + '</div>' + '</a>';
+                  return (
+                    '<a href="app-user-view-account.html">' +
+                    '<div class="d-flex align-items-center">' +
+                    '<img class="rounded-circle me-3" src="' +
+                    assetsPath +
+                    src +
+                    '" alt="' +
+                    name +
+                    '" height="32">' +
+                    '<div class="user-info">' +
+                    '<h6 class="mb-0">' +
+                    name +
+                    '</h6>' +
+                    '<small class="text-muted">' +
+                    subtitle +
+                    '</small>' +
+                    '</div>' +
+                    '</div>' +
+                    '</a>'
+                  );
                 },
-                notFound: '<div class="not-found px-3 py-2">' + '<h6 class="suggestions-header text-primary mb-2">Members</h6>' + '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' + '</div>'
-              }
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Members</h6>' +
+                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
+                  '</div>',
+              },
             }
           )
           //On typeahead result render.
@@ -564,7 +644,7 @@ if (typeof $ !== 'undefined') {
       $('.navbar-search-suggestion').each(function () {
         psSearch = new PerfectScrollbar($(this)[0], {
           wheelPropagation: false,
-          suppressScrollX: true
+          suppressScrollX: true,
         });
       });
 
@@ -582,6 +662,8 @@ if (typeof $ !== 'undefined') {
         const hours = Math.floor(diffInSeconds / 3600);
         const days = Math.floor(diffInSeconds / 86400);
         const weeks = Math.floor(diffInSeconds / 604800);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(days / 365);
 
         if (diffInSeconds < 60) {
           return 'just now';
@@ -595,30 +677,36 @@ if (typeof $ !== 'undefined') {
           return `${hours} hours ago`;
         } else if (days === 1) {
           return '1 day ago';
-        } else if (days < 7) {
+        } else if (days < 30) {
           return `${days} days ago`;
-        } else if (weeks === 1) {
-          return '1 week ago';
+        } else if (months === 1) {
+          return '1 month ago';
+        } else if (months < 12) {
+          return `${months} months ago`;
+        } else if (years === 1) {
+          return '1 year ago';
         } else {
-          return `${weeks} weeks ago`;
+          return `${years} years ago`;
         }
       }
 
       listNotifications.html('');
       function loadNotification(data) {
         totalNotifications.html(data?.length);
-        data.forEach(notif => {
+        data.forEach((notif) => {
           const icons = {
             info: 'info-circle',
             success: 'check',
             warning: 'alert-circle',
-            danger: 'alert-triangle'
+            danger: 'alert-triangle',
           };
           listNotifications.append(`<li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
             <div class="d-flex">
               <div class="flex-shrink-0 me-3">
                 <div class="avatar">
-                  <span class="avatar-initial rounded-circle bg-label-${notif.icon}"><i class="ti ti-${icons[notif.icon]}"></i></span>
+                  <span class="avatar-initial rounded-circle bg-label-${notif.icon}"><i class="ti ti-${
+            icons[notif.icon]
+          }"></i></span>
                 </div>
               </div>
               <div class="flex-grow-1">
@@ -639,13 +727,13 @@ if (typeof $ !== 'undefined') {
         url: '/api/notifications',
         type: 'GET',
         success: function (data) {
-          if(Array.isArray(data)) {
-            loadNotification(data)
+          if (Array.isArray(data)) {
+            loadNotification(data);
           }
         },
         error: function (e) {
           console.log(e.responseJSON.msg);
-        }
+        },
       });
     }
 
@@ -655,6 +743,5 @@ if (typeof $ !== 'undefined') {
         $(this).closest('li').closest('ul').closest('li').addClass('active open');
       }
     });
-
   });
 }
