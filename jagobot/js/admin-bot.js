@@ -100,6 +100,12 @@ $(document).ready(function () {
           },
         },
         {
+          targets: -3,
+          render: function (data, type, full, meta) {
+            return formatTime(full.uptime);
+          },
+        },
+        {
           targets: -2,
           render: function (data, type, full, meta) {
             return moment(full.lastActivity).fromNow();
@@ -124,11 +130,39 @@ $(document).ready(function () {
       lengthMenu: [7, 10, 25, 50, 75, 100],
       buttons: [
         {
-          text: '<i class="ti ti-help-hexagon me-sm-1"></i> <span class="d-none d-sm-inline-block">Installation Guide</span>',
-          className: 'btn btn-primary waves-effect waves-light',
-          action: function () {
-            window.location.href = '/u/installation';
-          },
+          extend: 'collection',
+          className: 'btn btn-label-primary dropdown-toggle me-2 waves-effect waves-light',
+          text: '<i class="ti ti-tool me-sm-1"></i> <span class="d-none d-sm-inline-block">Action Bot</span>',
+          buttons: [
+            {
+              text: '<i class="ti ti-device-floppy me-1" ></i>Save',
+              className: 'dropdown-item',
+              action: function () {
+                actionBot('save');
+              },
+            },
+            {
+              text: '<i class="ti ti-player-pause me-1" ></i>Stop',
+              className: 'dropdown-item',
+              action: function () {
+                actionBot('stop');
+              },
+            },
+            {
+              text: '<i class="ti ti-robot me-1" ></i>Restart',
+              className: 'dropdown-item',
+              action: function () {
+                actionBot('restart');
+              },
+            },
+            {
+              text: '<i class="ti ti-server-2 me-1" ></i>Reboot',
+              className: 'dropdown-item',
+              action: function () {
+                actionBot('reboot');
+              },
+            },
+          ],
         },
       ],
       responsive: {
@@ -173,6 +207,7 @@ $(document).ready(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       url: '?id=' + id,
       type: 'DELETE',
@@ -199,6 +234,62 @@ $(document).ready(function () {
         });
       },
     });
+  }
+
+  function actionBot(type) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to ' + type + ' all bots!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, ' + type + ' it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
+    }).then(function (result) {
+      if (result.value) {
+        $.blockUI({
+          message: itemLoader,
+          css: { backgroundColor: 'transparent', border: '0' },
+          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+        });
+
+        $.ajax({
+          url: '?type=' + type,
+          type: 'PUT',
+          success: function (d) {
+            $.unblockUI();
+            Swal.fire({
+              title: 'Good job!',
+              text: d.msg,
+              icon: 'success',
+              customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+              buttonsStyling: !1,
+            });
+          },
+          error: function (e) {
+            $.unblockUI();
+            let msg = e.responseJSON.msg;
+            Swal.fire({
+              title: 'Upss!',
+              text: msg ? msg : 'There is an error!',
+              icon: 'error',
+              customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+              buttonsStyling: !1,
+            });
+          },
+        });
+      }
+    });
+  }
+
+  function formatTime(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${hrs}h ${mins}m ${secs}s`;
   }
 
   // Filter form control to default size

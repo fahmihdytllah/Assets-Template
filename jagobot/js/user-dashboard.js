@@ -327,6 +327,11 @@ $(document).ready(function () {
       $('#earningPlatformChart').show();
       $('#earningPlatformChart').html('');
 
+      if (!labels || !series) {
+        $('#earningPlatformChart').html('<span class="text-muted">Please log in to your Adsense account first.<span>');
+        return;
+      }
+
       const earningPlatformChartE1 = document.querySelector('#earningPlatformChart'),
         total = series.reduce((accumulator, currentValue) => accumulator + currentValue, 0),
         earningPlatformChartConfig = {
@@ -453,6 +458,11 @@ $(document).ready(function () {
       $('.loaderCountryChart').loaderHide();
       $('#earningCountryChart').show();
       $('#earningCountryChart').html('');
+
+      if (!labels || !series) {
+        $('#earningCountryChart').html('<span class="text-muted">Please log in to your Adsense account first.<span>');
+        return;
+      }
 
       const earningCountryChartE1 = document.querySelector('#earningCountryChart'),
         total = series.reduce((accumulator, currentValue) => accumulator + currentValue, 0),
