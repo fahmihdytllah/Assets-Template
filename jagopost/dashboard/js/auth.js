@@ -14,7 +14,7 @@ let token;
 // Utils function
 function loadCaptcha() {
   grecaptcha.ready(function () {
-    grecaptcha.execute('6Ld0lDciAAAAAISScycKw-_qevx2UrHjXCuBF1dR').then((_token) => {
+    grecaptcha.execute('6Le3QkQqAAAAAEMi7-7X9FAu9TcdA0qH-t46IHu4').then((_token) => {
       token = _token;
       fieldToken.val(_token);
       btnSubmit.prop('disabled', false);
