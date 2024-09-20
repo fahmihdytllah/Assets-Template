@@ -334,7 +334,7 @@ $(document).ready(function () {
               ? ` <button data-id="${key._id}" data-type="${
                   key.type
                 }" class="btn btn-sm rounded-pill btn-label-primary mb-2 btn-buy">
-              <span class="ti-xs ti ti-wallet me-1"></span>${key.status === 'Pending' ? 'Bayar' : 'Perpanjang'}
+              <span class="ti-xs ti ti-wallet me-1"></span>${key.status === 'Pending' ? 'Buy Now' : 'Renew'}
             </button><br/>`
               : '';
 
