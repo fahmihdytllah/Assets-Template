@@ -42,7 +42,7 @@ $(document).ready(function () {
       data: $(this).serialize(),
       success: function (d) {
         formUpdateKey.unblock();
-        loadKeys();
+        dataKeys?.ajax.reload();
         $('#modalUpdateKey').modal('hide');
         Swal.fire({
           title: 'Good job!',
