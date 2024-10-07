@@ -34,7 +34,7 @@ $(document).ready(function () {
       },
       error: function (e) {
         formAddKey.unblock();
-        let msg = e.responseJSON.msg;
+        let msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
@@ -72,7 +72,7 @@ $(document).ready(function () {
       },
       error: function (e) {
         formSettingKey.unblock();
-        let msg = e.responseJSON.msg;
+        let msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
@@ -394,7 +394,7 @@ $(document).ready(function () {
       },
       error: function (e) {
         $.unblockUI();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
@@ -466,7 +466,7 @@ $(document).ready(function () {
       },
       error: function (e) {
         $.unblockUI();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
@@ -500,7 +500,7 @@ $(document).ready(function () {
       },
       error: function (e) {
         $.unblockUI();
-        let msg = e.responseJSON.msg;
+        let msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',
