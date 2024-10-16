@@ -352,10 +352,10 @@ $(document).ready(function () {
                   <div class="dropdown-menu dropdown-menu-start">
                     <button class="dropdown-item key-setting" data-id="${key._id}" ${
             key.status === 'Expired' ? 'disabled' : ''
-          }><i class="ti ti-settings-code me-2"></i>Pengaturan</button>
+          }><i class="ti ti-settings-code me-2"></i>Setting</button>
                     <button class="dropdown-item text-danger key-delete" data-id="${key._id}" ${
             key.type === 'trial' && key.status === 'Expired' ? 'disabled' : ''
-          }><i class="ti ti-trash me-2"></i>Hapus</button>
+          }><i class="ti ti-trash me-2"></i>Delete</button>
                   </div>
                 </div>
               </div>

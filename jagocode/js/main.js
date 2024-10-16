@@ -427,6 +427,112 @@ if (typeof $ !== 'undefined') {
       searchInput = $('.search-input'),
       contentBackdrop = $('.content-backdrop');
 
+    /** Display Notification */
+    const totalNotifications = $('.total-notification');
+    const listNotifications = $('.list-notification');
+
+    if (listNotifications?.length && totalNotifications?.length) {
+      function formNow(date) {
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        const minutes = Math.floor(diffInSeconds / 60);
+        const hours = Math.floor(diffInSeconds / 3600);
+        const days = Math.floor(diffInSeconds / 86400);
+        const weeks = Math.floor(diffInSeconds / 604800);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(days / 365);
+
+        if (diffInSeconds < 60) {
+          return 'just now';
+        } else if (minutes === 1) {
+          return '1 minute ago';
+        } else if (minutes < 60) {
+          return `${minutes} minutes ago`;
+        } else if (hours === 1) {
+          return '1 hour ago';
+        } else if (hours < 24) {
+          return `${hours} hours ago`;
+        } else if (days === 1) {
+          return '1 day ago';
+        } else if (days < 30) {
+          return `${days} days ago`;
+        } else if (months === 1) {
+          return '1 month ago';
+        } else if (months < 12) {
+          return `${months} months ago`;
+        } else if (years === 1) {
+          return '1 year ago';
+        } else {
+          return `${years} years ago`;
+        }
+      }
+
+      listNotifications.html('');
+
+      function loadNotification(data) {
+        totalNotifications.html(data?.length + ' New');
+
+        const icons = {
+          info: 'info-circle',
+          success: 'check',
+          warning: 'alert-circle',
+          danger: 'alert-triangle',
+        };
+
+        data.forEach((notif) => {
+          const element =
+            '<li class="list-group-item list-group-item-action dropdown-notifications-item">' +
+            '<div class="d-flex">' +
+            '<div class="flex-shrink-0 me-3">' +
+            '<div class="avatar">' +
+            '<span class="avatar-initial rounded-circle bg-label-' +
+            notif.icon +
+            '"><i class="ti ti-' +
+            icons[notif.icon] +
+            '"></i></span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="flex-grow-1">' +
+            '<h6 class="mb-1 small">' +
+            notif.title +
+            '</h6>' +
+            '<small class="mb-1 d-block text-body">' +
+            notif.message +
+            '</small>' +
+            '<small class="text-muted">' +
+            formNow(new Date(notif.createdAt)) +
+            '</small>' +
+            '</div>' +
+            '<div class="flex-shrink-0 dropdown-notifications-actions">' +
+            '<a href="javascript:void(0)" class="dropdown-notifications-read">' +
+            '<span class="badge badge-dot"></span>' +
+            '</a>' +
+            '<a href="javascript:void(0)" class="dropdown-notifications-archive">' +
+            '<span class="ti ti-x"></span>' +
+            '</a>' +
+            '</div>' +
+            '</div>' +
+            '</li>';
+
+          listNotifications.append(element);
+        });
+      }
+
+      $.ajax({
+        url: 'https://api.jagocode.my.id/notification',
+        type: 'GET',
+        success: function (data) {
+          if (Array.isArray(data)) {
+            loadNotification(data);
+          }
+        },
+        error: function (e) {
+          console.log(e.responseJSON.msg);
+        },
+      });
+    }
+
     // Open search input on click of search icon
     if (searchToggler.length) {
       searchToggler.on('click', function () {
@@ -462,7 +568,7 @@ if (typeof $ !== 'undefined') {
       });
     }, 10);
 
-    if (searchInput.length && false) {
+    if (searchInput.length) {
       // Filter config
       var filterConfig = function (data) {
         return function findMatches(q, cb) {
@@ -488,13 +594,10 @@ if (typeof $ !== 'undefined') {
       };
 
       // Search JSON
-      var searchJson = 'search-vertical.json'; // For vertical layout
-      if ($('#layout-menu').hasClass('menu-horizontal')) {
-        var searchJson = 'search-horizontal.json'; // For vertical layout
-      }
+
       // Search API AJAX call
       var searchData = $.ajax({
-        url: assetsPath + 'json/' + searchJson, //? Use your own search api instead
+        url: assetsPath + 'json/menu.json', //? Use your own search api instead
         dataType: 'json',
         async: false,
       }).responseJSON;
@@ -539,83 +642,6 @@ if (typeof $ !== 'undefined') {
                 notFound:
                   '<div class="not-found px-4 py-2">' +
                   '<h6 class="suggestions-header text-primary mb-2">Pages</h6>' +
-                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
-                  '</div>',
-              },
-            },
-            // Files
-            {
-              name: 'files',
-              display: 'name',
-              limit: 4,
-              source: filterConfig(searchData.files),
-              templates: {
-                header: '<h6 class="suggestions-header text-primary mb-0 mx-4 mt-3 pb-2">Files</h6>',
-                suggestion: function ({ src, name, subtitle, meta }) {
-                  return (
-                    '<a href="javascript:;">' +
-                    '<div class="d-flex w-50">' +
-                    '<img class="me-3" src="' +
-                    assetsPath +
-                    src +
-                    '" alt="' +
-                    name +
-                    '" height="32">' +
-                    '<div class="w-75">' +
-                    '<h6 class="mb-0">' +
-                    name +
-                    '</h6>' +
-                    '<small class="text-muted">' +
-                    subtitle +
-                    '</small>' +
-                    '</div>' +
-                    '</div>' +
-                    '<small class="text-muted">' +
-                    meta +
-                    '</small>' +
-                    '</a>'
-                  );
-                },
-                notFound:
-                  '<div class="not-found px-4 py-2">' +
-                  '<h6 class="suggestions-header text-primary mb-2">Files</h6>' +
-                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
-                  '</div>',
-              },
-            },
-            // Members
-            {
-              name: 'members',
-              display: 'name',
-              limit: 4,
-              source: filterConfig(searchData.members),
-              templates: {
-                header: '<h6 class="suggestions-header text-primary mb-0 mx-4 mt-3 pb-2">Members</h6>',
-                suggestion: function ({ name, src, subtitle }) {
-                  return (
-                    '<a href="app-user-view-account.html">' +
-                    '<div class="d-flex align-items-center">' +
-                    '<img class="rounded-circle me-3" src="' +
-                    assetsPath +
-                    src +
-                    '" alt="' +
-                    name +
-                    '" height="32">' +
-                    '<div class="user-info">' +
-                    '<h6 class="mb-0">' +
-                    name +
-                    '</h6>' +
-                    '<small class="text-muted">' +
-                    subtitle +
-                    '</small>' +
-                    '</div>' +
-                    '</div>' +
-                    '</a>'
-                  );
-                },
-                notFound:
-                  '<div class="not-found px-4 py-2">' +
-                  '<h6 class="suggestions-header text-primary mb-2">Members</h6>' +
                   '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
                   '</div>',
               },

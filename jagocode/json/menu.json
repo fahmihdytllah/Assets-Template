@@ -1,0 +1,19 @@
+{
+  "pages": [
+    {
+      "name": "Jago Post",
+      "icon": "ti-smart-home",
+      "url": "https://post.jagocode.id/"
+    },
+    {
+      "name": "Jago Bot",
+      "icon": "ti-smart-home",
+      "url": "https://bot.jagocode.id/"
+    },
+    {
+      "name": "Account Setting",
+      "icon": "ti-settings",
+      "url": "https://account.jagocode.id/setting/account"
+    }
+  ]
+}

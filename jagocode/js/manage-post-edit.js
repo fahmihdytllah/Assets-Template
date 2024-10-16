@@ -35,6 +35,18 @@ $(function () {
     });
   }
 
+  $('#changeView').on('change', function () {
+    if (this.value === 'html') {
+      $('#content-html').show();
+      $('#content-text').hide();
+      $('#content-html').val(contentEditor.root.innerHTML);
+    } else {
+      $('#content-text').show();
+      $('#content-html').hide();
+      contentEditor.clipboard.dangerouslyPasteHTML($('#content-html').val());
+    }
+  });
+
   // Comment editor
   if (contentEditorEl) {
     contentEditor = new Quill(contentEditorEl, {
@@ -88,6 +100,10 @@ $(function () {
       return tag.value;
     });
 
+    if ($('#content-text').is(':visible')) {
+      $('#content-html').val(contentEditor.root.innerHTML);
+    }
+
     $.blockUI({
       message: elementLoader,
       css: { backgroundColor: 'transparent', border: '0' },
@@ -98,7 +114,7 @@ $(function () {
       type: 'PUT',
       data: JSON.stringify({
         title: $('#post-title').val(),
-        content: contentEditor.root.innerHTML,
+        content: $('#content-html').val(),
         labels,
         status: $('#post-status').val(),
         publishedAt: $('#post-date').val(),

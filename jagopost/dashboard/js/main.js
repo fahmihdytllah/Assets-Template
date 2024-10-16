@@ -594,12 +594,16 @@ if (typeof $ !== 'undefined') {
           return `${hours} hours ago`;
         } else if (days === 1) {
           return '1 day ago';
-        } else if (days < 7) {
+        } else if (days < 30) {
           return `${days} days ago`;
-        } else if (weeks === 1) {
-          return '1 week ago';
+        } else if (months === 1) {
+          return '1 month ago';
+        } else if (months < 12) {
+          return `${months} months ago`;
+        } else if (years === 1) {
+          return '1 year ago';
         } else {
-          return `${weeks} weeks ago`;
+          return `${years} years ago`;
         }
       }
 

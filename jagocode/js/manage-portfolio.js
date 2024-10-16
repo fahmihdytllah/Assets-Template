@@ -1,7 +1,7 @@
 $(function () {
-  let dataUsersTable = $('.datatables-basic'),
+  let dataPortfolioTable = $('.datatables-basic'),
     formUpdate = $('#formEditUser'),
-    dataUsers;
+    dataPortfolio;
 
   formUpdate.submit(function (e) {
     e.preventDefault();
@@ -18,7 +18,7 @@ $(function () {
       success: function (d) {
         formUpdate.unblock();
         formUpdate[0].reset();
-        dataUsers.ajax.reload();
+        dataPortfolio.ajax.reload();
         $('#modalEdit').modal('hide');
 
         Swal.fire({
@@ -43,8 +43,14 @@ $(function () {
     });
   });
 
-  if (dataUsersTable.length) {
-    dataUsers = dataUsersTable.DataTable({
+  if (dataPortfolioTable.length) {
+    let statusObj = {
+      Ongoing: 'bg-label-warning',
+      Completed: 'bg-label-success',
+      Paused: 'bg-label-danger',
+    };
+
+    dataPortfolio = dataPortfolioTable.DataTable({
       ajax: {
         url: '?type=json',
         type: 'GET',
@@ -62,9 +68,9 @@ $(function () {
       columns: [
         { data: '_id' },
         { data: 'title' },
-        { data: 'labels' },
-        { data: 'isPublished' },
-        { data: 'publishedAt' },
+        { data: 'category' },
+        { data: 'status' },
+        { data: 'startDate' },
         { data: '' },
       ],
       columnDefs: [
@@ -85,7 +91,7 @@ $(function () {
             var $row_output =
               '<div class="d-flex justify-content-start align-items-center ">' +
               '<img src="' +
-              full.thumbnail +
+              full.images[0] +
               '" alt="' +
               full.title +
               '" class="rounded me-2 w-px-100">' +
@@ -93,6 +99,9 @@ $(function () {
               '<h6 class="text-nowrap mb-0">' +
               full.title +
               '</h6>' +
+              '<small class="text-truncate d-none d-sm-block">' +
+              full.technologies.join(', ') +
+              '</small>' +
               '</div>' +
               '</div>';
 
@@ -102,25 +111,25 @@ $(function () {
         {
           targets: 3,
           render: function (data, type, full, meta) {
-            return (
-              '<span class="badge bg-label-' +
-              (full.isPublished ? 'success' : 'warning') +
-              '" text-capitalized>' +
-              (full.isPublished ? 'Published' : 'Draft') +
-              '</span>'
-            );
+            return '<span class="badge ' + statusObj[full.status] + '" text-capitalized>' + full.status + '</span>';
           },
         },
         {
           targets: -2,
           render: function (data, type, full, meta) {
-            const publishedAt = new Date(full.publishedAt).toLocaleString('en-US', {
+            const startDate = new Date(full.startDate).toLocaleString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             });
 
-            return publishedAt;
+            const endDate = new Date(full.endDate).toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            });
+
+            return startDate + ' to ' + endDate;
           },
         },
         {
@@ -137,7 +146,7 @@ $(function () {
               '<button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></button>' +
               '<div class="dropdown-menu dropdown-menu-end m-0">' +
               '<a href="' +
-              full.slug +
+              full.link +
               '" target="_blank" class="dropdown-item">View</a>' +
               '<button class="dropdown-item text-danger btn-delete" data-id="' +
               full._id +
@@ -153,7 +162,7 @@ $(function () {
       lengthMenu: [7, 10, 25, 50, 75, 100],
       buttons: [
         {
-          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">New Post</span>',
+          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">New Portfolio</span>',
           className: 'create-new btn btn-primary waves-effect waves-light',
           action: function () {
             location.href = '?type=new';
@@ -165,7 +174,7 @@ $(function () {
           display: $.fn.dataTable.Responsive.display.modal({
             header: function (row) {
               var data = row.data();
-              return 'My post details';
+              return 'Portfolio Details';
             },
           }),
           type: 'column',
@@ -193,7 +202,7 @@ $(function () {
         },
       },
     });
-    $('div.head-label').html('<h5 class="card-title mb-0">Manage Posts</h5>');
+    $('div.head-label').html('<h5 class="card-title mb-0">Manage Portfolio</h5>');
   }
 
   $('.datatables-basic tbody').on('click', '.btn-delete', function () {
@@ -218,12 +227,13 @@ $(function () {
           css: { backgroundColor: 'transparent', border: '0' },
           overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
         });
+
         $.ajax({
           url: '?id=' + id,
           type: 'DELETE',
           success: function (d) {
             $.unblockUI();
-            dataPosts.row($this.parents('tr')).remove().draw();
+            dataPortfolio.row($this.parents('tr')).remove().draw();
             Swal.fire({
               title: 'Good job!',
               text: d.msg,
