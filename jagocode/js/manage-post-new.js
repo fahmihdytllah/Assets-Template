@@ -174,7 +174,7 @@ $(function () {
           () => {
             uploadTask.snapshot.ref.getDownloadURL().then((imageUrl) => {
               const range = contentEditor.getSelection();
-              quill.insertEmbed(range.index, 'image', imageUrl);
+              contentEditor.insertEmbed(range.index, 'image', imageUrl);
             });
           }
         );
