@@ -6,7 +6,7 @@
 
 :root {
   --color-background: #cad5e2;
-  --color-primary: #538ffb;
+  --color-primary: #f7cd2e;
   --font-family-base: Poppin, sans-serif;
   --font-size-h1: 1.25rem;
   --font-size-h2: 1rem;
@@ -86,7 +86,7 @@ input {
 input[type='number'] {
   width: 100%;
   padding: 10px;
-  border: 2px solid #538ffb;
+  border: 2px solid #f7cd2e;
   border-radius: 10px;
   box-sizing: border-box;
 }
@@ -160,10 +160,15 @@ a.button:active {
 }
 .button:focus,
 .button:hover {
-  background-color: #5b54fa;
+  background-color: #807044;
 }
 .button--full {
   width: 100%;
+}
+button:disabled {
+  pointer-events: none; /* Mencegah interaksi dengan tombol */
+  opacity: 0.5; /* Mengurangi opacity untuk efek disabled */
+  cursor: not-allowed; /* Ubah kursor menjadi 'not-allowed' */
 }
 .card {
   border-radius: 1em;
@@ -172,6 +177,35 @@ a.button:active {
   color: #fff;
   padding: 1em;
 }
+
+/* Header & Footer*/
+.header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+.footer {
+  position: fixed;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+/* Form Element */
 .form {
   display: grid;
   grid-gap: 2em;
@@ -208,30 +242,6 @@ a.button:active {
   grid-gap: 1em;
   gap: 1em;
 }
-.header {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  padding-left: 1em;
-  padding-right: 1em;
-}
-.footer {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  padding-left: 1em;
-  padding-right: 1em;
-}
 .icon {
   height: 1em;
   display: inline-block;
@@ -246,42 +256,73 @@ a.button:active {
   width: 1em;
   vertical-align: middle;
 }
-.close {
-  position: absolute;
-  float: right;
-  width: 2.2em;
-  height: 2.2em;
-  top: 15px;
-  right: 15px;
-}
-.iphone {
-  background-color: #fbf6f7;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#fbf6f7), to(#fff));
-  background-image: -o-linear-gradient(top, #fbf6f7, #fff);
-  background-image: linear-gradient(to bottom, #fbf6f7, #fff);
-  border-radius: 2em;
-  height: 812px;
-  -webkit-box-shadow: 0 0 1em rgba(0, 0, 0, 0.0625);
-  box-shadow: 0 0 1em rgba(0, 0, 0, 0.0625);
-  width: 375px;
-  overflow: auto;
-  padding: 2em;
-}
+
 .center {
   text-align: center;
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
-@media screen and (max-width: 420px) {
-  .iphone {
-    height: 612px;
+
+.close {
+  position: fixed; /* Posisi absolut di dalam elemen .screen */
+  top: -20px; /* Jarak dari atas layar */
+  right: -15px; /* Jarak dari kanan layar */
+  width: 2.2em;
+  height: 2.2em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.screen {
+  position: relative;
+  background-color: #fbf6f7;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fbf6f7), to(#fff));
+  background-image: -o-linear-gradient(top, #fbf6f7, #fff);
+  background-image: linear-gradient(to bottom, #fbf6f7, #fff);
+  border-radius: 15px;
+  height: 600px;
+  width: 250px;
+  -webkit-box-shadow: 0 0 1em rgba(0, 0, 0, 0.0625);
+  box-shadow: 0 0 1em rgba(0, 0, 0, 0.0625);
+  overflow: auto;
+  padding: 2em;
+}
+
+.screen {
+  overflow: -moz-scrollbars-none; /* Untuk Firefox lama */
+  -ms-overflow-style: none; /* Untuk IE dan Edge */
+  scrollbar-width: none; /* Untuk Firefox */
+}
+
+.screen::-webkit-scrollbar {
+  display: none; /* Untuk Chrome, Safari, dan Opera */
+}
+
+@media screen and (min-width: 320px) {
+  .screen {
+    height: 580px;
     width: 300px;
   }
 }
-@media screen and (min-width: 800px) {
-  .iphone {
-    height: 460px;
+
+@media screen and (min-width: 420px) {
+  .screen {
+    height: 680px;
+    width: 350px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .screen {
+    height: 680px;
+    width: 530px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .screen {
+    height: 500px;
     width: 800px;
   }
   .row {
@@ -294,12 +335,33 @@ a.button:active {
   #elink {
     width: 50%;
   }
-  .fbill {
+
+  .sticky-detail {
     position: -webkit-sticky !important;
     position: sticky !important;
     top: 0;
   }
 }
+
+@media screen and (min-width: 1440px) {
+  .screen {
+    height: 650px;
+    width: 1000px;
+  }
+}
+
+/** Rincian */
+.price-text,
+.service-fee-text,
+.tax-fee-text,
+.total-cost-text {
+  text-align: right;
+}
+
+/**
+ Loader
+*/
+
 .loading {
   position: fixed;
   z-index: 999;
@@ -323,7 +385,8 @@ a.button:active {
   height: 100%;
   background: #fff;
 }
-.preload {
+
+.loader {
   position: fixed;
   z-index: 999;
   height: 2em;
@@ -335,7 +398,8 @@ a.button:active {
   bottom: 0;
   right: 0;
 }
-.preload:before {
+
+.loader:before {
   content: '';
   display: block;
   position: fixed;
@@ -344,152 +408,70 @@ a.button:active {
   width: 100%;
   height: 100%;
   background: #fff;
+  opacity: 0.8;
 }
+
 .spinner {
-  width: 55px;
-  height: 45px;
-  text-align: center;
-  font-size: 10px;
-}
-.spinner > div {
-  margin: 1px;
-  background-color: var(--color-primary);
-  height: 100%;
-  width: 6px;
-  display: inline-block;
-  -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
-  animation: sk-stretchdelay 1.2s infinite ease-in-out;
-}
-.spinner .rect2 {
-  -webkit-animation-delay: -1.1s;
-  animation-delay: -1.1s;
-}
-.spinner .rect3 {
-  -webkit-animation-delay: -1s;
-  animation-delay: -1s;
-}
-.spinner .rect4 {
-  -webkit-animation-delay: -0.9s;
-  animation-delay: -0.9s;
-}
-.spinner .rect5 {
-  -webkit-animation-delay: -0.8s;
-  animation-delay: -0.8s;
-}
-@-webkit-keyframes sk-stretchdelay {
-  0%,
-  40%,
-  100% {
-    -webkit-transform: scaleY(0.4);
-  }
-  20% {
-    -webkit-transform: scaleY(1);
-  }
-}
-@keyframes sk-stretchdelay {
-  0%,
-  40%,
-  100% {
-    transform: scaleY(0.4);
-    -webkit-transform: scaleY(0.4);
-  }
-  20% {
-    transform: scaleY(1);
-    -webkit-transform: scaleY(1);
-  }
-}
-.sk-folding-cube {
-  margin: 20px auto;
   width: 40px;
   height: 40px;
   position: relative;
-  -webkit-transform: rotateZ(45deg);
-  transform: rotateZ(45deg);
+  text-align: center;
+
+  -webkit-animation: sk-rotate 2s infinite linear;
+  animation: sk-rotate 2s infinite linear;
 }
-.sk-folding-cube .sk-cube {
-  float: left;
-  width: 50%;
-  height: 50%;
-  position: relative;
-  -webkit-transform: scale(1.1);
-  -ms-transform: scale(1.1);
-  transform: scale(1.1);
-}
-.sk-folding-cube .sk-cube:before {
-  content: '';
+
+.dot1,
+.dot2 {
+  width: 60%;
+  height: 60%;
+  display: inline-block;
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background-color: var(--color-primary);
-  -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
-  animation: sk-foldCubeAngle 2.4s infinite linear both;
-  -webkit-transform-origin: 100% 100%;
-  -ms-transform-origin: 100% 100%;
-  transform-origin: 100% 100%;
+  border-radius: 100%;
+
+  -webkit-animation: sk-bounce 2s infinite ease-in-out;
+  animation: sk-bounce 2s infinite ease-in-out;
 }
-.sk-folding-cube .sk-cube2 {
-  -webkit-transform: scale(1.1) rotateZ(90deg);
-  transform: scale(1.1) rotateZ(90deg);
+
+.dot2 {
+  top: auto;
+  bottom: 0;
+  -webkit-animation-delay: -1s;
+  animation-delay: -1s;
 }
-.sk-folding-cube .sk-cube3 {
-  -webkit-transform: scale(1.1) rotateZ(180deg);
-  transform: scale(1.1) rotateZ(180deg);
-}
-.sk-folding-cube .sk-cube4 {
-  -webkit-transform: scale(1.1) rotateZ(270deg);
-  transform: scale(1.1) rotateZ(270deg);
-}
-.sk-folding-cube .sk-cube2:before {
-  -webkit-animation-delay: 0.3s;
-  animation-delay: 0.3s;
-}
-.sk-folding-cube .sk-cube3:before {
-  -webkit-animation-delay: 0.6s;
-  animation-delay: 0.6s;
-}
-.sk-folding-cube .sk-cube4:before {
-  -webkit-animation-delay: 0.9s;
-  animation-delay: 0.9s;
-}
-@-webkit-keyframes sk-foldCubeAngle {
-  0%,
-  10% {
-    -webkit-transform: perspective(140px) rotateX(-180deg);
-    transform: perspective(140px) rotateX(-180deg);
-    opacity: 0;
-  }
-  25%,
-  75% {
-    -webkit-transform: perspective(140px) rotateX(0deg);
-    transform: perspective(140px) rotateX(0deg);
-    opacity: 1;
-  }
-  90%,
+
+@-webkit-keyframes sk-rotate {
   100% {
-    -webkit-transform: perspective(140px) rotateY(180deg);
-    transform: perspective(140px) rotateY(180deg);
-    opacity: 0;
+    -webkit-transform: rotate(360deg);
   }
 }
-@keyframes sk-foldCubeAngle {
-  0%,
-  10% {
-    -webkit-transform: perspective(140px) rotateX(-180deg);
-    transform: perspective(140px) rotateX(-180deg);
-    opacity: 0;
-  }
-  25%,
-  75% {
-    -webkit-transform: perspective(140px) rotateX(0deg);
-    transform: perspective(140px) rotateX(0deg);
-    opacity: 1;
-  }
-  90%,
+@keyframes sk-rotate {
   100% {
-    -webkit-transform: perspective(140px) rotateY(180deg);
-    transform: perspective(140px) rotateY(180deg);
-    opacity: 0;
+    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes sk-bounce {
+  0%,
+  100% {
+    -webkit-transform: scale(0);
+  }
+  50% {
+    -webkit-transform: scale(1);
+  }
+}
+
+@keyframes sk-bounce {
+  0%,
+  100% {
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+    -webkit-transform: scale(1);
   }
 }

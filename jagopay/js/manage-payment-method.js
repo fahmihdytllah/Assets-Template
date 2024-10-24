@@ -7,7 +7,7 @@ $(function () {
   let dataPayMethod;
 
   let categoryObj = {
-    ewallet: 'E-Wallet',
+    'e-wallet': 'E-Wallet',
     qris: 'Qris',
     bank: 'Bank Transfer',
     card: 'Card',
