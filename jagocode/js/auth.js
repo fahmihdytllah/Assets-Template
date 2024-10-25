@@ -191,27 +191,35 @@ $(function () {
   $(window).on('message', function (event) {
     const origin = event.originalEvent.origin;
 
-    if (origin === 'http://localhost:3005') {
-      const code = event.originalEvent.data.code;
-      fetchData(code);
+    if (origin === 'https://account.jagocode.id') {
+      const code = event.originalEvent?.data?.code;
+      if (code) {
+        fetchData(code);
+      }
     }
   });
 
   function openPopup(type) {
-    const popupWidth = 500;
-    const popupHeight = 600;
+    const width = 500;
+    const height = 600;
 
-    const screenWidth = window.screen.width;
-    const screenHeight = window.screen.height;
+    const screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
+    const screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
 
-    const left = (screenWidth - popupWidth) / 2;
-    const top = (screenHeight - popupHeight) / 2;
+    const left = (screenWidth - width) / 2 + window.screenX;
+    const top = (screenHeight - height) / 2 + window.screenY;
 
-    window.open(
+    const popupWindow = window.open(
       '/auth/redirect?type=' + type,
-      'popupWindow',
-      `width=${popupWidth},height=${popupHeight},top=${top},left=${left},scrollbars=yes,resizable=yes`
+      'Login Account',
+      `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
     );
+
+    if (popupWindow) {
+      popupWindow.focus();
+    } else {
+      alert('Popup blocked. Please allow popups for this website.');
+    }
   }
 });
 
