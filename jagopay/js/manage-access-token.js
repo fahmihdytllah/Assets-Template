@@ -145,7 +145,7 @@ $(document).ready(function () {
                   <div class="dropdown-menu dropdown-menu-start">
                     <button class="dropdown-item token-edit" data-id="${
                       token._id
-                    }"><i class="ti ti-edit-2 me-2"></i>Edit</button>
+                    }"><i class="ti ti-edit me-2"></i>Edit</button>
                     <button class="dropdown-item text-danger token-delete" data-id="${
                       token._id
                     }"><i class="ti ti-trash me-2"></i>Delete</button>
