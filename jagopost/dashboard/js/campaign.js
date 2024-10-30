@@ -276,8 +276,8 @@ $(function () {
             keywords += '<span class="badge rounded-pill me-1 mb-1 bg-label-dark fw-medium">' + keyword + '</span>';
           });
 
-          $('#listCampaigns').append(`<div class="col-md-6" id="${camp._id}">
-            <div class="bg-lighter rounded p-3 mb-3 position-relative">
+          $('#listCampaigns').append(`<div class="col-md-6 mb-6" id="${camp._id}">
+            <div class="bg-lighter rounded p-3 position-relative">
               <div class="dropdown api-key-actions">
                 <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-settings ti-sm"></i></a>
                 <div class="dropdown-menu dropdown-menu-end">
@@ -289,14 +289,14 @@ $(function () {
                   }"><i class="ti ti-trash me-2"></i>Remove</button>
                 </div>
               </div>
-              <div class="d-flex align-items-center mb-3">
+              <div class="d-flex align-items-center mb-4">
                 <h4 class="mb-0 me-3">${camp.name}</h4>
                 <span class="badge bg-label-${camp.isActive ? 'success' : 'danger'} me-2">${
             camp.isActive ? 'ACTIVE' : 'NON ACTIVE'
           }</span>
                 <span class="badge bg-label-primary">${camp.platform.toUpperCase()}</span>
               </div>
-              <div class="mb-2">
+              <div class="mb-4">
                 ${keywords}
               </div>
               <span class="text-muted">${camp.cronText}</span>

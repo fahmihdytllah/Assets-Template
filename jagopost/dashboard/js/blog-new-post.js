@@ -2,7 +2,6 @@ $(function () {
   let formSelectLanguage = $('#formSelectLanguage'),
     formSearchContent = $('#formSearchContent'),
     blogID = $('#blogID').val(),
-    postID = $('#postID').val(),
     select2 = $('.select2'),
     clipboardList = [].slice.call(document.querySelectorAll('.clipboard-btn')),
     dataArticles = [],
@@ -11,7 +10,7 @@ $(function () {
     tagify = null,
     editor = null;
 
-  loadLabels();
+  loadLabels(blogID);
   loadDataSocial();
 
   $(document).on('click', '.btn-ai', function () {
@@ -123,16 +122,16 @@ $(function () {
       data: $(this).serialize(),
       url: $(this).attr('action'),
       type: 'POST',
-      success: function (d) {
+      success: function (res) {
         $.unblockUI();
         Swal.fire({
           title: 'Good job!',
-          text: d.msg,
+          text: res.msg,
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary' },
           buttonsStyling: !1,
         }).then(() => {
-          const url = blogID === 'wp' ? '/u/w/posts' : '/u/b/posts/' + blogID;
+          const url = blogID === 'wp' ? '/u/w/posts' : '/u/b/posts/';
           window.location.href = url;
         });
       },
@@ -428,7 +427,7 @@ $(function () {
         editor.clipboard.dangerouslyPasteHTML(res.content);
         Swal.fire({
           title: 'Good job!',
-          text: d.msg,
+          text: res.msg,
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary' },
           buttonsStyling: !1,

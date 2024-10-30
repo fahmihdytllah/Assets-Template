@@ -106,6 +106,26 @@ $(function () {
             const url =
               full.blogId === 'wp' ? '/u/w/posts/' + full['id'] : '/u/b/posts/' + full.blogId + '/' + full['id'];
 
+            return (
+              '<div class="d-inline-block">' +
+              '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>' +
+              '<ul class="dropdown-menu dropdown-menu-end m-0">' +
+              '<li><a href="' +
+              full['url'] +
+              '" class="dropdown-item"><i class="ti-xs ti ti-eye me-1"></i>Show</a></a></li>' +
+              '<div class="dropdown-divider"></div>' +
+              '<li><button data-blog="' +
+              full.blogId +
+              '" data-id="' +
+              full['id'] +
+              '" class="dropdown-item text-danger delete-post"><i class="ti-xs ti ti-trash me-1"></i>Delete</button></li>' +
+              '</ul>' +
+              '</div>' +
+              '<a href="' +
+              url +
+              '" class="btn btn-sm btn-text-secondary rounded-pill btn-icon item-edit"><i class="ti ti-pencil ti-md"></i></a>'
+            );
+
             return `<div class="d-inline-block">
               <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                 <i class="text-primary ti ti-dots-vertical"></i>
@@ -120,14 +140,21 @@ $(function () {
           },
         },
       ],
-      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-6 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end mt-n6 mt-md-0"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
       displayLength: 10,
       lengthMenu: [10, 25, 50, 75, 100],
+      language: {
+        paginate: {
+          next: '<i class="ti ti-chevron-right ti-sm"></i>',
+          previous: '<i class="ti ti-chevron-left ti-sm"></i>',
+        },
+      },
       buttons: [
         {
           extend: 'collection',
-          className: 'btn btn-label-primary dropdown-toggle me-2 waves-effect waves-light',
-          text: '<i class="ti ti-tool me-sm-1"></i> <span class="d-none d-sm-inline-block">Tools</span>',
+          className: 'btn btn-label-primary dropdown-toggle me-4 waves-effect waves-light border-none',
+          text: '<i class="ti ti-tool ti-xs me-sm-1"></i> <span class="d-none d-sm-inline-block">Tools</span>',
+
           buttons: [
             {
               text: '<i class="ti ti-sparkles me-1" ></i>AI Content',
@@ -264,6 +291,9 @@ $(function () {
             return data ? $('<table class="table"/><tbody />').append(data) : false;
           },
         },
+      },
+      initComplete: function (settings, json) {
+        $('.card-header').after('<hr class="my-0">');
       },
     });
     $('div.head-label').html('<h5 class="card-title mb-0">My Posts</h5>');

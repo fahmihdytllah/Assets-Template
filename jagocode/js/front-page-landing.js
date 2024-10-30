@@ -23,20 +23,20 @@
   const width = screen.width;
   if (width >= mediaQueryXL && heroAnimation) {
     heroAnimation.addEventListener('mousemove', function parallax(e) {
-      animationElements.forEach(layer => {
+      animationElements.forEach((layer) => {
         layer.style.transform = 'translateZ(1rem)';
       });
-      animationImg.forEach(layer => {
+      animationImg.forEach((layer) => {
         let x = (window.innerWidth - e.pageX * 2) / 100;
         let y = (window.innerHeight - e.pageY * 2) / 100;
         layer.style.transform = `perspective(1200px) rotateX(${y}deg) rotateY(${x}deg) scale3d(1, 1, 1)`;
       });
     });
     nav.addEventListener('mousemove', function parallax(e) {
-      animationElements.forEach(layer => {
+      animationElements.forEach((layer) => {
         layer.style.transform = 'translateZ(1rem)';
       });
-      animationImg.forEach(layer => {
+      animationImg.forEach((layer) => {
         let x = (window.innerWidth - e.pageX * 2) / 100;
         let y = (window.innerHeight - e.pageY * 2) / 100;
         layer.style.transform = `perspective(1200px) rotateX(${y}deg) rotateY(${x}deg) scale3d(1, 1, 1)`;
@@ -44,10 +44,10 @@
     });
 
     heroAnimation.addEventListener('mouseout', function () {
-      animationElements.forEach(layer => {
+      animationElements.forEach((layer) => {
         layer.style.transform = 'translateZ(0)';
       });
-      animationImg.forEach(layer => {
+      animationImg.forEach((layer) => {
         layer.style.transform = 'perspective(1200px) scale(1) rotateX(0) rotateY(0)';
       });
     });
@@ -63,34 +63,34 @@
       grabCursor: true,
       autoplay: {
         delay: 3000,
-        disableOnInteraction: false
+        disableOnInteraction: false,
       },
       loop: true,
       loopAdditionalSlides: 1,
       navigation: {
         nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev'
+        prevEl: '.swiper-button-prev',
       },
       breakpoints: {
         1200: {
-          slidesPerView: 3
+          slidesPerView: 3,
         },
         992: {
-          slidesPerView: 2
-        }
-      }
+          slidesPerView: 2,
+        },
+      },
     });
   }
 
   // Reviews slider next and previous
   // -----------------------------------
   // Add click event listener to next button
-  ReviewsNextBtn.addEventListener('click', function () {
-    ReviewsSliderNext.click();
-  });
-  ReviewsPreviousBtn.addEventListener('click', function () {
-    ReviewsSliderPrev.click();
-  });
+  // ReviewsNextBtn.addEventListener('click', function () {
+  //   ReviewsSliderNext.click();
+  // });
+  // ReviewsPreviousBtn.addEventListener('click', function () {
+  //   ReviewsSliderPrev.click();
+  // });
 
   // Review client logo
   // -----------------------------------
@@ -99,16 +99,16 @@
       slidesPerView: 2,
       autoplay: {
         delay: 3000,
-        disableOnInteraction: false
+        disableOnInteraction: false,
       },
       breakpoints: {
         992: {
-          slidesPerView: 5
+          slidesPerView: 5,
         },
         768: {
-          slidesPerView: 3
-        }
-      }
+          slidesPerView: 3,
+        },
+      },
     });
   }
 
@@ -134,11 +134,12 @@
         });
       }
     }
-    // togglePrice Event Listener
-    togglePrice();
 
-    priceDurationToggler.onchange = function () {
-      togglePrice();
-    };
+    // togglePrice Event Listener
+    // togglePrice();
+
+    // priceDurationToggler.onchange = function () {
+    //   togglePrice();
+    // };
   });
 })();

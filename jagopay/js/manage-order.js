@@ -1,4 +1,8 @@
 $(function () {
+  const formOrder = $('#formOrder');
+  const dt_order_table = $('.datatables-order');
+
+  let dataOrders, idOrder;
   let borderColor, bodyBg, headingColor;
 
   if (isDarkStyle) {
@@ -12,15 +16,19 @@ $(function () {
   }
 
   // Variable declaration for table
-  var dt_order_table = $('.datatables-order'),
-    statusObj = {
-      pending: { title: 'Pending', class: 'bg-label-warning' },
-      completed: { title: 'Completed', class: 'bg-label-success' },
-      failed: { title: 'Failed', class: 'bg-label-danger' },
-    };
+  let statusObj = {
+    pending: { title: 'Pending', class: 'bg-label-warning' },
+    completed: { title: 'Completed', class: 'bg-label-success' },
+    failed: { title: 'Failed', class: 'bg-label-danger' },
+  };
+
+  $(document).on('click', '.edit-order', function () {
+    idOrder = $(this).data('id');
+    orderDetail(idOrder);
+  });
 
   if (dt_order_table.length) {
-    var dt_products = dt_order_table.DataTable({
+    dataOrders = dt_order_table.DataTable({
       ajax: {
         url: '?type=json',
         type: 'GET',
@@ -39,9 +47,9 @@ $(function () {
         { data: '_id' },
         { data: 'updatedAt' },
         { data: 'accessToken' },
-        { data: 'transaction' } /** amount */,
-        { data: 'customer' },
-        { data: 'transaction' } /** paymentMethod */,
+        { data: 'amount' } /** amount */,
+        { data: 'customerDetails' },
+        { data: 'paymentMethod' } /** paymentMethod */,
         { data: 'status' },
         { data: '' },
       ],
@@ -78,24 +86,38 @@ $(function () {
         {
           targets: 3,
           render: function (data, type, full, meta) {
-            return full.transaction.amount;
+            const formattedAmount = full.amount.toLocaleString('id-ID', {
+              style: 'currency',
+              currency: 'IDR',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            });
+
+            return formattedAmount;
           },
         },
         {
           targets: 4,
           responsivePriority: 1,
           render: function (data, type, full, meta) {
-            var $name = full?.customer?.name || 'Null',
-              $email = full?.customer?.email || full?.customer?.number || 0;
+            var $name = full.isUser ? full.user.name : full?.customerDetails?.name || '-',
+              $number = full.isUser
+                ? full.user.phoneNumber
+                : full?.customerDetails?.email || full?.customerDetails?.phoneNumber || 0;
 
-            // For Avatar badge
-            var stateNum = Math.floor(Math.random() * 6);
-            var states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
-            var $state = states[stateNum],
-              $initials = $name.match(/\b\w/g) || [];
-
-            $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-            $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
+            if (full.isUser) {
+              // For Avatar image
+              var $output = '<img src="' + full.user.avatar + '" alt="Avatar" class="rounded-circle">';
+            } else {
+              // For Avatar badge
+              var stateNum = Math.floor(Math.random() * 6);
+              var states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
+              var $state = states[stateNum],
+                $initials = $name.match(/\b\w/g) || [],
+                $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase(),
+                $output =
+                  '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
+            }
 
             var $row_output =
               '<div class="d-flex justify-content-start align-items-center order-name text-nowrap">' +
@@ -109,7 +131,7 @@ $(function () {
               $name +
               '</a></h6>' +
               '<small>' +
-              $email +
+              $number +
               '</small>' +
               '</div>' +
               '</div>';
@@ -121,7 +143,7 @@ $(function () {
           render: function (data, type, full, meta) {
             // const logo =
             //   '<img src="' + assetsPath + 'img/icons/payments/' + $method + '.png" alt="' + $method + '" width="29">';
-            return full.transaction?.paymentMethod || 'Default';
+            return full.paymentMethod?.name || 'Default';
           },
         },
         {
@@ -150,10 +172,12 @@ $(function () {
               '<div class="d-flex justify-content-sm-start align-items-sm-center">' +
               '<button class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>' +
               '<div class="dropdown-menu dropdown-menu-end m-0">' +
-              '<a href="app-ecommerce-order-details.html" class="dropdown-item">View</a>' +
-              '<a href="javascript:0;" class="dropdown-item delete-record">' +
-              'Delete' +
-              '</a>' +
+              '<button class="dropdown-item edit-order" data-id="' +
+              full._id +
+              '"><i class="ti ti-edit"></i>Edit</button>' +
+              '<button class="dropdown-item delete-order text-danger" data-id="' +
+              full._id +
+              '"><i class="ti ti-trash"></i>Delete</button>' +
               '</div>' +
               '</div>'
             );
@@ -356,9 +380,109 @@ $(function () {
     $('.dataTables_filter').addClass('ms-n3 mb-0 mb-md-6');
   }
 
-  // Delete Record
-  $('.datatables-order tbody').on('click', '.delete-record', function () {
-    dt_products.row($(this).parents('tr')).remove().draw();
+  formOrder.submit(function (e) {
+    e.preventDefault();
+
+    formOrder.block({
+      message: elementLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: '?id=' + idOrder,
+      type: 'PUT',
+      data: formOrder.serialize(),
+      success: function (res) {
+        formOrder.unblock();
+        formOrder[0].reset();
+        $('#modalOrder').modal('hide');
+        dataOrders.ajax.reload();
+
+        Swal.fire({
+          title: 'Good job!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
+      },
+      error: function (e) {
+        formOrder.unblock();
+        let msg = e.responseJSON?.msg;
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: !1,
+        });
+      },
+    });
+  });
+
+  function orderDetail(id) {
+    $.get('?type=detail&id=' + id, function (res) {
+      $('#amount').val(res.amount);
+      $('#status').val(res.status);
+      $('#token').val(res.token);
+      $('#customerName').val(res?.customerDetails?.name || res?.user?.name);
+      $('#customerEmail').val(res?.customerDetails?.email);
+      $('#customerNumber').val(res?.customerDetails?.phoneNumber || res?.user?.phoneNumber);
+      $('#customerAddress').val(res?.customerDetails?.address);
+      $('#modalOrder').modal('show');
+    });
+  }
+
+  $('.datatables-basic tbody').on('click', '.delete-order', function () {
+    const $this = $(this);
+    const id = $this.data('id');
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this order!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
+    }).then(function (result) {
+      if (result.value) {
+        $.blockUI({
+          message: elementLoader,
+          css: { backgroundColor: 'transparent', border: '0' },
+          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+        });
+
+        $.ajax({
+          url: '?id=' + id,
+          type: 'DELETE',
+          success: function (d) {
+            $.unblockUI();
+            dataOrders.row($this.parents('tr')).remove().draw();
+            Swal.fire({
+              title: 'Good job!',
+              text: d.msg,
+              icon: 'success',
+              customClass: { confirmButton: 'btn btn-success waves-effect waves-light' },
+            });
+          },
+          error: function (e) {
+            $.unblockUI();
+            const msg = e.responseJSON.msg;
+            Swal.fire({
+              title: 'Upss!',
+              text: msg ? msg : 'There is an error!',
+              icon: 'error',
+              customClass: { confirmButton: 'btn btn-primary' },
+            });
+          },
+        });
+      }
+    });
   });
 
   // Filter form control to default size

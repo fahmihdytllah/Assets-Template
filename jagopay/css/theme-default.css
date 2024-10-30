@@ -191,8 +191,8 @@ button:disabled {
   padding-left: 1em;
   padding-right: 1em;
 }
+
 .footer {
-  position: fixed;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
