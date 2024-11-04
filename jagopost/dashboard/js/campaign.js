@@ -178,10 +178,13 @@ $(function () {
   });
 
   function changeBlog(platform) {
+    /** Load blogs */
     $('#selectBlogs').html('');
     listBlogs[platform].forEach((blog) => {
       $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
     });
+
+    $('#selectBlogs').trigger('change');
   }
 
   function loadDataGrapgh() {
@@ -190,12 +193,17 @@ $(function () {
       isGraphLoaded = true;
       listBlogs = res.listBlogs;
 
-      if (res.isLoggedGoogle) {
+      /** Load blogs */
+      if (listBlogs?.length) {
         $('#selectBlogs').html('');
         listBlogs[res.platform].forEach((blog) => {
           $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
         });
 
+        $('#selectBlogs').trigger('change');
+      }
+
+      if (res.isLoggedGoogle) {
         $('.googleIndexer').prop('disabled', false);
       } else {
         $('.googleIndexer').prop('disabled', true);
@@ -318,10 +326,10 @@ $(function () {
 
     $.get('?type=detail&id=' + id, function (res) {
       $('#name').val(res.data?.name);
-      $('#selectBlogs').val(res.data?.blogId).trigger('change');
       $('#typeSearch').val(res.data?.typeSearch).trigger('change');
       $('#language').val(res.data?.language).trigger('change');
       $('#selectPlatforms').val(res.data?.platform).trigger('change');
+      $('#selectBlogs').val(res.data?.blogId).trigger('change');
 
       keywords.removeAllTags();
       keywords.addTags(res.data?.keywords);
