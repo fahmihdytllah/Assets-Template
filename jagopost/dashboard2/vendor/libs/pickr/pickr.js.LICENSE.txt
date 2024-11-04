@@ -1,1 +1,0 @@
-/*! NanoPop 2.3.0 MIT | https://github.com/Simonwep/nanopop */

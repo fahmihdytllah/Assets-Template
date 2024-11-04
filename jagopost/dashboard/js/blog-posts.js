@@ -153,7 +153,7 @@ $(function () {
         {
           extend: 'collection',
           className: 'btn btn-label-primary dropdown-toggle me-4 waves-effect waves-light border-none',
-          text: '<i class="ti ti-tool ti-xs me-sm-1"></i> <span class="d-none d-sm-inline-block">Tools</span>',
+          text: '<i class="ti ti-tools ti-xs me-sm-1"></i> <span class="d-none d-sm-inline-block">Smart Tools</span>',
 
           buttons: [
             {
