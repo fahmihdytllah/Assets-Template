@@ -21,10 +21,18 @@ if (document.getElementById('layout-menu')) {
 
   if (typeof Waves !== 'undefined') {
     Waves.init();
-    Waves.attach(".btn[class*='btn-']:not([class*='btn-outline-']):not([class*='btn-label-'])", ['waves-light']);
-    Waves.attach("[class*='btn-outline-']");
-    Waves.attach("[class*='btn-label-']");
+    Waves.attach(
+      ".btn[class*='btn-']:not(.position-relative):not([class*='btn-outline-']):not([class*='btn-label-'])",
+      ['waves-light']
+    );
+    Waves.attach("[class*='btn-outline-']:not(.position-relative)");
+    Waves.attach("[class*='btn-label-']:not(.position-relative)");
     Waves.attach('.pagination .page-item .page-link');
+    Waves.attach('.dropdown-menu .dropdown-item');
+    Waves.attach('.light-style .list-group .list-group-item-action');
+    Waves.attach('.dark-style .list-group .list-group-item-action', ['waves-light']);
+    Waves.attach('.nav-tabs:not(.nav-tabs-widget) .nav-item .nav-link');
+    Waves.attach('.nav-pills .nav-item .nav-link', ['waves-light']);
   }
 
   // Initialize menu
@@ -115,6 +123,9 @@ if (document.getElementById('layout-menu')) {
   //Style Switcher (Light/Dark/System Mode)
   let styleSwitcher = document.querySelector('.dropdown-style-switcher');
 
+  // Active class on style switcher dropdown items
+  const activeStyle = document.documentElement.getAttribute('data-style');
+
   // Get style from local storage or use 'system' as default
   let storedStyle =
     localStorage.getItem('templateCustomizer-' + templateName + '--Style') || //if no template style then use Customizer style
@@ -124,6 +135,7 @@ if (document.getElementById('layout-menu')) {
   if (window.templateCustomizer && styleSwitcher) {
     let styleSwitcherItems = [].slice.call(styleSwitcher.children[1].querySelectorAll('.dropdown-item'));
     styleSwitcherItems.forEach(function (item) {
+      item.classList.remove('active');
       item.addEventListener('click', function () {
         let currentStyle = this.getAttribute('data-theme');
         if (currentStyle === 'light') {
@@ -134,6 +146,11 @@ if (document.getElementById('layout-menu')) {
           window.templateCustomizer.setStyle('system');
         }
       });
+
+      if (item.getAttribute('data-theme') === activeStyle) {
+        // Add 'active' class to the item if it matches the activeStyle
+        item.classList.add('active');
+      }
     });
 
     // Update style switcher icon based on the stored style
@@ -147,13 +164,13 @@ if (document.getElementById('layout-menu')) {
         fallbackPlacements: ['bottom'],
       });
     } else if (storedStyle === 'dark') {
-      styleSwitcherIcon.classList.add('ti-moon');
+      styleSwitcherIcon.classList.add('ti-moon-stars');
       new bootstrap.Tooltip(styleSwitcherIcon, {
         title: 'Dark Mode',
         fallbackPlacements: ['bottom'],
       });
     } else {
-      styleSwitcherIcon.classList.add('ti-device-desktop');
+      styleSwitcherIcon.classList.add('ti-device-desktop-analytics');
       new bootstrap.Tooltip(styleSwitcherIcon, {
         title: 'System Mode',
         fallbackPlacements: ['bottom'],
@@ -167,79 +184,78 @@ if (document.getElementById('layout-menu')) {
   // Internationalization (Language Dropdown)
   // ---------------------------------------
 
-  // if (typeof i18next !== 'undefined' && typeof i18NextHttpBackend !== 'undefined') {
-  //   i18next
-  //     .use(i18NextHttpBackend)
-  //     .init({
-  //       lng: window.templateCustomizer ? window.templateCustomizer.settings.lang : 'en',
-  //       debug: false,
-  //       fallbackLng: 'en',
-  //       backend: {
-  //         loadPath: assetsPath + 'json/locales/{{lng}}.json'
-  //       },
-  //       returnObjects: true
-  //     })
-  //     .then(function (t) {
-  //       localize();
-  //     });
-  // }
+  if (typeof i18next !== 'undefined' && typeof i18NextHttpBackend !== 'undefined' && false) {
+    i18next
+      .use(i18NextHttpBackend)
+      .init({
+        lng: window.templateCustomizer ? window.templateCustomizer.settings.lang : 'en',
+        debug: false,
+        fallbackLng: 'en',
+        backend: {
+          loadPath: assetsPath + 'json/locales/{{lng}}.json',
+        },
+        returnObjects: true,
+      })
+      .then(function (t) {
+        localize();
+      });
+  }
 
-  // let languageDropdown = document.getElementsByClassName('dropdown-language');
+  let languageDropdown = document.getElementsByClassName('dropdown-language');
 
-  // if (languageDropdown.length) {
-  //   let dropdownItems = languageDropdown[0].querySelectorAll('.dropdown-item');
+  if (languageDropdown.length && false) {
+    let dropdownItems = languageDropdown[0].querySelectorAll('.dropdown-item');
 
-  //   for (let i = 0; i < dropdownItems.length; i++) {
-  //     dropdownItems[i].addEventListener('click', function () {
-  //       let currentLanguage = this.getAttribute('data-language');
-  //       let textDirection = this.getAttribute('data-text-direction');
+    for (let i = 0; i < dropdownItems.length; i++) {
+      dropdownItems[i].addEventListener('click', function () {
+        let currentLanguage = this.getAttribute('data-language');
+        let textDirection = this.getAttribute('data-text-direction');
 
-  //       for (let sibling of this.parentNode.children) {
-  //         var siblingEle = sibling.parentElement.parentNode.firstChild;
+        for (let sibling of this.parentNode.children) {
+          var siblingEle = sibling.parentElement.parentNode.firstChild;
 
-  //         // Loop through each sibling and push to the array
-  //         while (siblingEle) {
-  //           if (siblingEle.nodeType === 1 && siblingEle !== siblingEle.parentElement) {
-  //             siblingEle.querySelector('.dropdown-item').classList.remove('active');
-  //           }
-  //           siblingEle = siblingEle.nextSibling;
-  //         }
-  //       }
-  //       this.classList.add('active');
+          // Loop through each sibling and push to the array
+          while (siblingEle) {
+            if (siblingEle.nodeType === 1 && siblingEle !== siblingEle.parentElement) {
+              siblingEle.querySelector('.dropdown-item').classList.remove('active');
+            }
+            siblingEle = siblingEle.nextSibling;
+          }
+        }
+        this.classList.add('active');
 
-  //       i18next.changeLanguage(currentLanguage, (err, t) => {
-  //         window.templateCustomizer ? window.templateCustomizer.setLang(currentLanguage) : '';
-  //         directionChange(textDirection);
-  //         if (err) return console.log('something went wrong loading', err);
-  //         localize();
-  //       });
-  //     });
-  //   }
+        i18next.changeLanguage(currentLanguage, (err, t) => {
+          window.templateCustomizer ? window.templateCustomizer.setLang(currentLanguage) : '';
+          directionChange(textDirection);
+          if (err) return console.log('something went wrong loading', err);
+          localize();
+        });
+      });
+    }
+    function directionChange(textDirection) {
+      if (textDirection === 'rtl') {
+        if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') !== 'true')
+          window.templateCustomizer ? window.templateCustomizer.setRtl(true) : '';
+      } else {
+        if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') === 'true')
+          window.templateCustomizer ? window.templateCustomizer.setRtl(false) : '';
+      }
+    }
+  }
 
-  //   function directionChange(textDirection) {
-  //     if (textDirection === 'rtl') {
-  //       if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') !== 'true')
-  //         window.templateCustomizer ? window.templateCustomizer.setRtl(true) : '';
-  //     } else {
-  //       if (localStorage.getItem('templateCustomizer-' + templateName + '--Rtl') === 'true')
-  //         window.templateCustomizer ? window.templateCustomizer.setRtl(false) : '';
-  //     }
-  //   }
-  // }
+  function localize() {
+    let i18nList = document.querySelectorAll('[data-i18n]');
+    // Set the current language in dd
+    let currentLanguageEle = document.querySelector('.dropdown-item[data-language="' + i18next.language + '"]');
 
-  // function localize() {
-  //   let i18nList = document.querySelectorAll('[data-i18n]');
-  //   // Set the current language in dd
-  //   let currentLanguageEle = document.querySelector('.dropdown-item[data-language="' + i18next.language + '"]');
+    if (currentLanguageEle) {
+      currentLanguageEle.click();
+    }
 
-  //   if (currentLanguageEle) {
-  //     currentLanguageEle.click();
-  //   }
-
-  //   i18nList.forEach(function (item) {
-  //     item.innerHTML = i18next.t(item.dataset.i18n);
-  //   });
-  // }
+    i18nList.forEach(function (item) {
+      item.innerHTML = i18next.t(item.dataset.i18n);
+    });
+  }
 
   // Notification
   // ------------
@@ -409,9 +425,113 @@ if (typeof $ !== 'undefined') {
     var searchToggler = $('.search-toggler'),
       searchInputWrapper = $('.search-input-wrapper'),
       searchInput = $('.search-input'),
-      contentBackdrop = $('.content-backdrop'),
-      totalNotifications = $('.totalNotifications'),
-      listNotifications = $('.listNotifications');
+      contentBackdrop = $('.content-backdrop');
+
+    /** Display Notification */
+    const totalNotifications = $('.total-notification');
+    const listNotifications = $('.list-notification');
+
+    if (listNotifications?.length && totalNotifications?.length) {
+      function formNow(date) {
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        const minutes = Math.floor(diffInSeconds / 60);
+        const hours = Math.floor(diffInSeconds / 3600);
+        const days = Math.floor(diffInSeconds / 86400);
+        const weeks = Math.floor(diffInSeconds / 604800);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(days / 365);
+
+        if (diffInSeconds < 60) {
+          return 'just now';
+        } else if (minutes === 1) {
+          return '1 minute ago';
+        } else if (minutes < 60) {
+          return `${minutes} minutes ago`;
+        } else if (hours === 1) {
+          return '1 hour ago';
+        } else if (hours < 24) {
+          return `${hours} hours ago`;
+        } else if (days === 1) {
+          return '1 day ago';
+        } else if (days < 30) {
+          return `${days} days ago`;
+        } else if (months === 1) {
+          return '1 month ago';
+        } else if (months < 12) {
+          return `${months} months ago`;
+        } else if (years === 1) {
+          return '1 year ago';
+        } else {
+          return `${years} years ago`;
+        }
+      }
+
+      listNotifications.html('');
+
+      function loadNotification(data) {
+        totalNotifications.html(data?.length + ' New');
+
+        const icons = {
+          info: 'info-circle',
+          success: 'check',
+          warning: 'alert-circle',
+          danger: 'alert-triangle',
+        };
+
+        data.forEach((notif) => {
+          const element =
+            '<li class="list-group-item list-group-item-action dropdown-notifications-item">' +
+            '<div class="d-flex">' +
+            '<div class="flex-shrink-0 me-3">' +
+            '<div class="avatar">' +
+            '<span class="avatar-initial rounded-circle bg-label-' +
+            notif.icon +
+            '"><i class="ti ti-' +
+            icons[notif.icon] +
+            '"></i></span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="flex-grow-1">' +
+            '<h6 class="mb-1 small">' +
+            notif.title +
+            '</h6>' +
+            '<small class="mb-1 d-block text-body">' +
+            notif.message +
+            '</small>' +
+            '<small class="text-muted">' +
+            formNow(new Date(notif.createdAt)) +
+            '</small>' +
+            '</div>' +
+            '<div class="flex-shrink-0 dropdown-notifications-actions">' +
+            '<a href="javascript:void(0)" class="dropdown-notifications-read">' +
+            '<span class="badge badge-dot"></span>' +
+            '</a>' +
+            '<a href="javascript:void(0)" class="dropdown-notifications-archive">' +
+            '<span class="ti ti-x"></span>' +
+            '</a>' +
+            '</div>' +
+            '</div>' +
+            '</li>';
+
+          listNotifications.append(element);
+        });
+      }
+
+      $.ajax({
+        url: 'https://api.jagocode.my.id/notification',
+        type: 'GET',
+        success: function (data) {
+          if (Array.isArray(data)) {
+            loadNotification(data);
+          }
+        },
+        error: function (e) {
+          console.log(e.responseJSON.msg);
+        },
+      });
+    }
 
     // Open search input on click of search icon
     if (searchToggler.length) {
@@ -448,8 +568,7 @@ if (typeof $ !== 'undefined') {
       });
     }, 10);
 
-    if (false) {
-      // searchInput.length
+    if (searchInput.length) {
       // Filter config
       var filterConfig = function (data) {
         return function findMatches(q, cb) {
@@ -475,13 +594,10 @@ if (typeof $ !== 'undefined') {
       };
 
       // Search JSON
-      var searchJson = 'search-vertical.json'; // For vertical layout
-      if ($('#layout-menu').hasClass('menu-horizontal')) {
-        var searchJson = 'search-horizontal.json'; // For vertical layout
-      }
+
       // Search API AJAX call
       var searchData = $.ajax({
-        url: assetsPath + 'json/' + searchJson, //? Use your own search api instead
+        url: assetsPath + '../jagocode/json/menu.json', //? Use your own search api instead
         dataType: 'json',
         async: false,
       }).responseJSON;
@@ -495,7 +611,7 @@ if (typeof $ !== 'undefined') {
               classNames: {
                 menu: 'tt-menu navbar-search-suggestion',
                 cursor: 'active',
-                suggestion: 'suggestion d-flex justify-content-between px-3 py-2 w-100',
+                suggestion: 'suggestion d-flex justify-content-between px-4 py-2 w-100',
               },
             },
             // ? Add/Update blocks as per need
@@ -506,7 +622,7 @@ if (typeof $ !== 'undefined') {
               limit: 5,
               source: filterConfig(searchData.pages),
               templates: {
-                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Pages</h6>',
+                header: '<h6 class="suggestions-header text-primary mb-0 mx-4 mt-3 pb-2">Pages</h6>',
                 suggestion: function ({ url, icon, name }) {
                   return (
                     '<a href="' +
@@ -524,85 +640,8 @@ if (typeof $ !== 'undefined') {
                   );
                 },
                 notFound:
-                  '<div class="not-found px-3 py-2">' +
+                  '<div class="not-found px-4 py-2">' +
                   '<h6 class="suggestions-header text-primary mb-2">Pages</h6>' +
-                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
-                  '</div>',
-              },
-            },
-            // Files
-            {
-              name: 'files',
-              display: 'name',
-              limit: 4,
-              source: filterConfig(searchData.files),
-              templates: {
-                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Files</h6>',
-                suggestion: function ({ src, name, subtitle, meta }) {
-                  return (
-                    '<a href="javascript:;">' +
-                    '<div class="d-flex w-50">' +
-                    '<img class="me-3" src="' +
-                    assetsPath +
-                    src +
-                    '" alt="' +
-                    name +
-                    '" height="32">' +
-                    '<div class="w-75">' +
-                    '<h6 class="mb-0">' +
-                    name +
-                    '</h6>' +
-                    '<small class="text-muted">' +
-                    subtitle +
-                    '</small>' +
-                    '</div>' +
-                    '</div>' +
-                    '<small class="text-muted">' +
-                    meta +
-                    '</small>' +
-                    '</a>'
-                  );
-                },
-                notFound:
-                  '<div class="not-found px-3 py-2">' +
-                  '<h6 class="suggestions-header text-primary mb-2">Files</h6>' +
-                  '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
-                  '</div>',
-              },
-            },
-            // Members
-            {
-              name: 'members',
-              display: 'name',
-              limit: 4,
-              source: filterConfig(searchData.members),
-              templates: {
-                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Members</h6>',
-                suggestion: function ({ name, src, subtitle }) {
-                  return (
-                    '<a href="app-user-view-account.html">' +
-                    '<div class="d-flex align-items-center">' +
-                    '<img class="rounded-circle me-3" src="' +
-                    assetsPath +
-                    src +
-                    '" alt="' +
-                    name +
-                    '" height="32">' +
-                    '<div class="user-info">' +
-                    '<h6 class="mb-0">' +
-                    name +
-                    '</h6>' +
-                    '<small class="text-muted">' +
-                    subtitle +
-                    '</small>' +
-                    '</div>' +
-                    '</div>' +
-                    '</a>'
-                  );
-                },
-                notFound:
-                  '<div class="not-found px-3 py-2">' +
-                  '<h6 class="suggestions-header text-primary mb-2">Members</h6>' +
                   '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> No Results Found</p>' +
                   '</div>',
               },
@@ -650,90 +689,6 @@ if (typeof $ !== 'undefined') {
 
       searchInput.on('keyup', function () {
         psSearch.update();
-      });
-    }
-
-    if (listNotifications?.length && totalNotifications?.length) {
-      function formNow(date) {
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-
-        const minutes = Math.floor(diffInSeconds / 60);
-        const hours = Math.floor(diffInSeconds / 3600);
-        const days = Math.floor(diffInSeconds / 86400);
-        const weeks = Math.floor(diffInSeconds / 604800);
-        const months = Math.floor(days / 30);
-        const years = Math.floor(days / 365);
-
-        if (diffInSeconds < 60) {
-          return 'just now';
-        } else if (minutes === 1) {
-          return '1 minute ago';
-        } else if (minutes < 60) {
-          return `${minutes} minutes ago`;
-        } else if (hours === 1) {
-          return '1 hour ago';
-        } else if (hours < 24) {
-          return `${hours} hours ago`;
-        } else if (days === 1) {
-          return '1 day ago';
-        } else if (days < 30) {
-          return `${days} days ago`;
-        } else if (months === 1) {
-          return '1 month ago';
-        } else if (months < 12) {
-          return `${months} months ago`;
-        } else if (years === 1) {
-          return '1 year ago';
-        } else {
-          return `${years} years ago`;
-        }
-      }
-
-      listNotifications.html('');
-      function loadNotification(data) {
-        totalNotifications.html(data?.length);
-        data.forEach((notif) => {
-          const icons = {
-            info: 'info-circle',
-            success: 'check',
-            warning: 'alert-circle',
-            danger: 'alert-triangle',
-          };
-          listNotifications.append(`<li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-            <div class="d-flex">
-              <div class="flex-shrink-0 me-3">
-                <div class="avatar">
-                  <span class="avatar-initial rounded-circle bg-label-${notif.icon}"><i class="ti ti-${
-            icons[notif.icon]
-          }"></i></span>
-                </div>
-              </div>
-              <div class="flex-grow-1">
-                <h6 class="mb-1">${notif.title}</h6>
-                <p class="mb-0">${notif.message}</p>
-                <small class="text-muted">${formNow(new Date(notif.createdAt))}</small>
-              </div>
-              <div class="flex-shrink-0 dropdown-notifications-actions">
-                <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ti ti-x"></span></a>
-              </div>
-            </div>
-          </li>`);
-        });
-      }
-
-      $.ajax({
-        url: '/api/notifications',
-        type: 'GET',
-        success: function (data) {
-          if (Array.isArray(data)) {
-            loadNotification(data);
-          }
-        },
-        error: function (e) {
-          console.log(e.responseJSON.msg);
-        },
       });
     }
 
