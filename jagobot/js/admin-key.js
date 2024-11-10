@@ -113,7 +113,7 @@ $(document).ready(function () {
         {
           targets: 2,
           render: function (data, type, full, meta) {
-            return full.userId?.countryPhone + full.userId?.number;
+            return full.userId?.phoneCode + full.userId?.phoneNumber;
           },
         },
         {

@@ -130,8 +130,8 @@ $(function () {
     });
     $.ajax({
       data: {
-        orderId: res.transaction.order_id,
-        paymentMethod: res.transaction.payment_method,
+        orderId: res.referenceId,
+        paymentMethod: res.paymentMethod.name,
       },
       url: '/api/payment/process',
       type: 'POST',
@@ -147,7 +147,7 @@ $(function () {
       },
       error: function (e) {
         $.unblockUI();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg;
         Swal.fire({
           title: 'Upss!',
           text: msg ? msg : 'There is an error!',

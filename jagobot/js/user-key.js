@@ -407,7 +407,7 @@ $(document).ready(function () {
   }
 
   function handlerPay(token) {
-    fpay(token, {
+    JagoPay(token, {
       onSuccess: function (data) {
         paymentProcess(data);
       },
@@ -449,8 +449,8 @@ $(document).ready(function () {
     });
     $.ajax({
       data: {
-        orderId: res.transaction.order_id,
-        paymentMethod: res.transaction.payment_method,
+        orderId: res.referenceId,
+        paymentMethod: res.paymentMethod.name,
       },
       url: '/api/payment/process',
       type: 'POST',

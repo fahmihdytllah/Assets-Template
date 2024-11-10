@@ -292,8 +292,9 @@ $(document).ready(function () {
     return `<div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3" id="bot-${bot._id}">
       <div class="card bot-card">
         <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex justify-content-left align-items-center">
+          <div class="d-flex justify-content-left align-items-center mb-1">
             <i class="fis fi fi-xs fi-${bot.countryCode.toLowerCase()} rounded-circle fs-1 me-3"></i>
+
             <div class="d-flex flex-column">
               <span class="fw-medium">${bot.ip}</span>
               <div class="d-flex align-items-center bot-status">
