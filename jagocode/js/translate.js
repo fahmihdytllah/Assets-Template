@@ -16,13 +16,7 @@ function setCookie(name, value, days, domain) {
   const expires = '; expires=' + date.toUTCString();
 
   document.cookie =
-    name +
-    '=' +
-    encodeURIComponent(value) +
-    expires +
-    '; path=/' +
-    (domain ? '; domain=' + domain : '') +
-    '; SameSite=None; Secure';
+    name + '=' + value + expires + '; path=/' + (domain ? '; domain=' + domain : '') + '; SameSite=None; Secure';
 }
 
 function getCookie(name) {
@@ -51,7 +45,7 @@ $(document).ready(function () {
       const cookiesLang = '/en/' + selectedLang;
 
       setCookie('googtrans', cookiesLang, 365, '.jagocode.id');
-      setCookie('googtrans', cookiesLang, 365, window.location.hostname);
+      setCookie('googtrans', cookiesLang, 365);
     }
 
     if (selectedLang !== 'en') {
