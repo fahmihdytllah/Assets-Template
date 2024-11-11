@@ -34,19 +34,20 @@ function getCookie(name) {
   return null;
 }
 
+function deleteCookies() {
+  const domains = [window.location.hostname, '.' + window.location.hostname.split('.').slice(-2).join('.')];
+
+  domains.forEach((domain) => {
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+  });
+}
+
 $(document).ready(function () {
   const preferredLanguage = getCookie('googtrans');
 
   if (preferredLanguage) {
     const getLang = preferredLanguage.split('/');
     const selectedLang = getLang ? getLang[2] : 'en';
-
-    if (window.location.hostname !== 'localhost') {
-      const cookiesLang = '/en/' + selectedLang;
-
-      setCookie('googtrans', cookiesLang, 365, '.jagocode.id');
-      setCookie('googtrans', cookiesLang, 365);
-    }
 
     if (selectedLang !== 'en') {
       loadGoogleTranslateScript();
@@ -77,13 +78,16 @@ $(document).ready(function () {
   $('.dropdown-language .dropdown-item').on('click', function () {
     const selectedLang = $(this).data('language');
     const textDirection = $(this).data('text-direction');
-    const cookiesLang = '/en/' + selectedLang;
 
     directionChange(textDirection);
 
-    setCookie('googtrans', cookiesLang, 365, '.jagocode.id');
-    setCookie('googtrans', cookiesLang, 365, window.location.hostname);
+    if (selectedLang === 'en') {
+      deleteCookies();
+    }
 
-    window.location.reload();
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('lang', selectedLang);
+
+    window.location.href = currentUrl.toString();
   });
 });
