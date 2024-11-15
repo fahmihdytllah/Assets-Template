@@ -1,14 +1,22 @@
 $(document).ready(function () {
   const formAddKey = $('#formAddKey');
   const formSettingKey = $('#formSettingKey');
-  const countryPhone = $('#countryPhone');
-  const countryCode = $('#countryCode');
-  let showKey = {};
+  const formBilling = $('#formBilling');
 
-  // load Key
+  const billingId = $('#billingId');
+  const billingType = $('#billingType');
+  const billingPeriod = $('#billingPeriod');
+
+  let showKey = {},
+    isPromo = false,
+    isBillingVisible = false,
+    mode = 'new',
+    updateBillingTimeout;
+
+  /** load Key */
   loadKeys();
 
-  // handle event
+  /** handle event */
   $('#formAddKey').submit(function (e) {
     e.preventDefault();
     formAddKey.block({
@@ -16,6 +24,7 @@ $(document).ready(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       url: $(this).attr('action'),
       type: 'POST',
@@ -155,23 +164,138 @@ $(document).ready(function () {
     });
   });
 
-  $(document).on('click', '.btn-buy', function () {
-    let idKey = $(this).data('id');
-    let typeKey = $(this).data('type');
-    Swal.fire({
-      text: 'Are you sure you want to buy this key?',
-      icon: 'info',
-      showCancelButton: true,
-      confirmButtonText: 'Yes',
-      customClass: {
-        confirmButton: 'btn btn-primary waves-effect waves-light',
-        cancelButton: 'btn btn-outline-danger ms-2 waves-effect waves-light',
+  $('#applyPromo').click(function () {
+    formBilling.block({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: '/api/applyPromo',
+      data: formBilling.serialize(),
+      type: 'POST',
+      success: function (res) {
+        formBilling.unblock();
+        $('.amount-subtotal').text(res.subtotal);
+        $('.amount-discount').text(res.discount);
+        $('.amount-total').text(res.total);
+        isPromo = true;
+
+        Swal.fire({
+          title: 'Good News',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: false,
+        });
       },
-      buttonsStyling: false,
-    }).then(function (result) {
-      if (result.value) {
-        buyKey(idKey, typeKey);
-      }
+      error: function (e) {
+        formBilling.unblock();
+        const msg = e.responseJSON?.msg;
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: false,
+        });
+      },
+    });
+  });
+
+  $('#modalBilling').on('shown.bs.modal', function () {
+    isBillingVisible = true;
+  });
+
+  $('#modalBilling').on('hidden.bs.modal', function () {
+    isBillingVisible = false;
+  });
+
+  billingPeriod.on('input', function () {
+    const id = billingId.val();
+    const type = billingType.val();
+    const period = $(this).val();
+    updateBilling(id, type, period);
+  });
+
+  $('#decrease').on('click', function () {
+    let period = parseInt(billingPeriod.val());
+    const id = billingId.val();
+    const type = billingType.val();
+
+    if (period > 1) {
+      period--;
+      billingPeriod.val(period);
+      updateBilling(id, type, period);
+    }
+  });
+
+  $('#increase').on('click', function () {
+    let period = parseInt(billingPeriod.val());
+    const id = billingId.val();
+    const type = billingType.val();
+
+    if (period < 12) {
+      period++;
+      billingPeriod.val(period);
+      updateBilling(id, type, period);
+    }
+  });
+
+  billingType.change(function () {
+    const id = billingId.val();
+    const type = $(this).val();
+    updateBilling(id, type);
+  });
+
+  $(document).on('click', '.btn-buy', function () {
+    const id = $(this).data('id');
+    const type = $(this).data('type');
+    mode = 'new';
+    updateBilling(id, type);
+  });
+
+  $(document).on('click', '.btn-renew', function () {
+    const id = $(this).data('id');
+    const type = $(this).data('type');
+    mode = 'renew';
+    updateBilling(id, type);
+  });
+
+  formBilling.submit(function (e) {
+    e.preventDefault();
+
+    const id = billingId.val();
+    const type = billingType.val();
+    const period = billingPeriod.val();
+    const code = isPromo ? $('#promoCode').val() : null;
+
+    $.blockUI({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: '/api/payment',
+      data: { id, type, code, mode, period },
+      type: 'POST',
+      success: function (res) {
+        $.unblockUI();
+        handlerPay(res.token);
+      },
+      error: function (e) {
+        $.unblockUI();
+        const msg = e.responseJSON?.msg;
+        Swal.fire({
+          title: 'Upss!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: false,
+        });
+      },
     });
   });
 
@@ -193,6 +317,46 @@ $(document).ready(function () {
 
     showKey[idKey] = !showKey[idKey];
   });
+
+  const updateBilling = (id, type, period) => {
+    clearTimeout(updateBillingTimeout);
+
+    updateBillingTimeout = setTimeout(() => {
+      billingInfo(id, type, period);
+    }, 600);
+  };
+
+  function billingInfo(id, type, period) {
+    !isBillingVisible &&
+      $.blockUI({
+        message: itemLoader,
+        css: { backgroundColor: 'transparent', border: '0' },
+        overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+      });
+
+    $.ajax({
+      data: { id, type, period },
+      url: '/api/billingInfo',
+      type: 'POST',
+      success: function (res) {
+        !isBillingVisible && $.unblockUI();
+
+        billingId.val(id);
+        billingType.val(type);
+        billingPeriod.val(res.period);
+
+        $('.amount-subtotal').text(res.subtotal);
+        $('.amount-discount').text(res.discount);
+        $('.amount-total').text(res.total);
+
+        $('#modalBilling').modal('show');
+      },
+      error: function (err) {
+        !isBillingVisible && $.unblockUI();
+        console.log(err);
+      },
+    });
+  }
 
   function settingKey(id) {
     $.get('keys?type=detail&id=' + id, function (res) {
@@ -318,6 +482,12 @@ $(document).ready(function () {
     $('#listKeys').html('');
     $('#loadingKeys').show();
 
+    const Colors = {
+      Active: 'label-success',
+      Pending: 'label-warning',
+      Expired: 'label-danger',
+    };
+
     $.get('keys?type=json', function (res) {
       $('#loadingKeys').hide();
       if (res.data?.length === 0) {
@@ -328,81 +498,91 @@ $(document).ready(function () {
         </div>`);
       } else {
         res.data.forEach((key) => {
-          const statusKey = key.status === 'Active' ? 'success' : key.status === 'Pending' ? 'warning' : 'danger';
-          const isBtnBuyOrRenew =
+          const buttonBuyOrRenew =
             (key.status === 'Expired' && key.type !== 'trial') || key.status === 'Pending'
-              ? ` <button data-id="${key._id}" data-type="${
-                  key.type
-                }" class="btn btn-sm rounded-pill btn-label-primary mb-2 btn-buy">
-              <span class="ti-xs ti ti-wallet me-1"></span>${key.status === 'Pending' ? 'Buy Now' : 'Renew'}
-            </button><br/>`
+              ? '<button data-id="' +
+                key._id +
+                '" data-type="' +
+                key.type +
+                '" class="btn btn-label-primary btn-sm btn-buy rounded-pill mt-4 ">' +
+                '<span class="ti-xs ti ti-wallet me-1"></span>' +
+                (key.status === 'Pending' ? 'Buy Now' : 'Renew') +
+                '</button><br/>'
               : '';
 
-          $('#listKeys').append(`<div class="col-md-6 col-xl-4">
-            <div class="card card-key mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center">
-                  <h4 class="mb-0 me-3">${key.name}</h4>
-                  <span class="badge rounded-pill bg-label-info me-2">${key.type.toUpperCase()}</span>
-                  <span class="badge rounded-pill bg-label-${statusKey}">${key.status.toUpperCase()}</span>
-                </div>
+          const buttonRenew =
+            '<button class="dropdown-item btn-renew" data-id="' +
+            key._id +
+            '" data-type="' +
+            key.type +
+            '" ' +
+            '><i class="ti ti-wallet me-2"></i>Renew</button>';
 
-                <div class="dropdown">
-                  <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
-                  <div class="dropdown-menu dropdown-menu-start">
-                    <button class="dropdown-item key-setting" data-id="${key._id}" ${
-            key.status === 'Expired' ? 'disabled' : ''
-          }><i class="ti ti-settings-code me-2"></i>Setting</button>
-                    <button class="dropdown-item text-danger key-delete" data-id="${key._id}" ${
-            key.type === 'trial' && key.status === 'Expired' ? 'disabled' : ''
-          }><i class="ti ti-trash me-2"></i>Delete</button>
-                  </div>
-                </div>
-              </div>
+          const buttonSetting =
+            '<button class="dropdown-item key-setting" data-id="' +
+            key._id +
+            '" ' +
+            '><i class="ti ti-settings-code me-2"></i>Setting</button>';
 
-              <div class="d-flex align-items-center mb-3">
-                <p class="me-2 mb-0 fw-medium" id="key-${key._id}">******************</p>
-                  <span class="text-muted cursor-pointer me-2 show-key" data-id="${key._id}" data-key="${
-            key.key
-          }"><i class="ti ti-eye ti-sm"></i></span>
-                <span class="text-muted cursor-pointer copy-key" data-key="${
-                  key.key
-                }"><i class="ti ti-copy ti-sm"></i></span>
-              </div>
-              ${isBtnBuyOrRenew}
-              <span class="text-muted">Expires on ${moment(key.expiredAt).calendar()}</span>
-            </div>
-          </div>`);
+          const dropdown =
+            '<button class="btn dropdown-toggle dropdown-toggle-split hide-arrow cursor-pointer" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>' +
+            '<div class="dropdown-menu">' +
+            (key.status === 'Active' ? buttonSetting : '') +
+            (key.status !== 'Pending' ? buttonRenew : '') +
+            (key.status !== 'Pending' || key.status === 'Active' ? '<div class="dropdown-divider"></div>' : '') +
+            '<button class="dropdown-item text-danger key-delete" data-id="' +
+            key._id +
+            '" ' +
+            '><i class="ti ti-trash me-2"></i>Delete</button>' +
+            '</div>';
+
+          $('#listKeys').append(
+            '<div class="col-md-6 col-xl-4 mb-4">' +
+              '<div class="card card-key">' +
+              '<div class="card-header header-elements">' +
+              '<h5 class="mb-0 me-2">' +
+              key.name +
+              '</h5>' +
+              '<div class="card-header-elements">' +
+              '<span class="badge bg-label-info rounded-pill me-1">' +
+              key.type.toUpperCase() +
+              '</span>' +
+              '<span class="badge bg-' +
+              Colors[key.status] +
+              ' rounded-pill">' +
+              key.status.toUpperCase() +
+              '</span>' +
+              '</div>' +
+              '<div class="card-header-elements ms-auto">' +
+              (key.type === 'trial' && key.status === 'Expired' ? '' : dropdown) +
+              '</div>' +
+              '</div>' +
+              '<div class="card-body">' +
+              '<div class="d-flex align-items-center">' +
+              '<p class="me-2 mb-0 fw-medium" id="key-' +
+              key._id +
+              '">******************</p> ' +
+              '<span class="text-muted cursor-pointer me-2 show-key" data-id="' +
+              key._id +
+              '" data-key="' +
+              key.key +
+              '"><i class="ti ti-eye ti-sm"></i></span>' +
+              '<span class="text-muted cursor-pointer copy-key" data-key="' +
+              key.key +
+              '"><i class="ti ti-copy ti-sm"></i></span>' +
+              '</div>' +
+              buttonBuyOrRenew +
+              '</div>' +
+              '<div class="card-footer">' +
+              '<span class="text-muted">Expires on ' +
+              moment(key.expiredAt).calendar() +
+              '</span>' +
+              '</div>' +
+              '</div>' +
+              '</div>'
+          );
         });
       }
-    });
-  }
-
-  function buyKey(id, type) {
-    $.blockUI({
-      message: itemLoader,
-      css: { backgroundColor: 'transparent', border: '0' },
-      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
-    });
-    $.ajax({
-      url: '/api/payment',
-      data: { id, type },
-      type: 'POST',
-      success: function (res) {
-        $.unblockUI();
-        handlerPay(res.token);
-      },
-      error: function (e) {
-        $.unblockUI();
-        const msg = e.responseJSON?.msg;
-        Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
-          icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
-        });
-      },
     });
   }
 
@@ -526,12 +706,4 @@ $(document).ready(function () {
       )
       .catch(() => console.log('Gagal mengcopy!'));
   };
-
-  // Input phone number
-  if (countryPhone) {
-    $.get('https://ipwhois.app/json/', function (data) {
-      countryPhone.val(data.country_phone.replace('+', ''));
-      countryCode.html(`${data.country_code} (${data.country_phone})`);
-    });
-  }
 });
