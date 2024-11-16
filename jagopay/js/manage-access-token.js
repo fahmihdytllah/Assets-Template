@@ -130,41 +130,61 @@ $(document).ready(function () {
       }
 
       res.data.forEach((token) => {
-        $('#listTokens').append(`<div class="col-md-6 col-xl-4">
-            <div class="card card-key mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center">
-                  <h4 class="mb-0 me-3">${token.name}</h4>
-                  <span class="badge rounded-pill bg-label-${token.isActive ? 'success' : 'danger'}">${
-          token.isActive ? 'Active' : 'inActive'
-        }</span>
-                </div>
+        const dropdown =
+          '<button class="btn dropdown-toggle dropdown-toggle-split hide-arrow cursor-pointer" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>' +
+          '<div class="dropdown-menu">' +
+          '<button class="dropdown-item token-edit" data-id="' +
+          token._id +
+          '" ' +
+          '><i class="ti ti-settings-code me-2"></i>Setting</button>' +
+          '<div class="dropdown-divider"></div>' +
+          '<button class="dropdown-item text-danger token-delete" data-id="' +
+          token._id +
+          '" ' +
+          '><i class="ti ti-trash me-2"></i>Delete</button>' +
+          '</div>';
 
-                <div class="dropdown">
-                  <a class="btn dropdown-toggle text-muted hide-arrow p-0" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
-                  <div class="dropdown-menu dropdown-menu-start">
-                    <button class="dropdown-item token-edit" data-id="${
-                      token._id
-                    }"><i class="ti ti-edit me-2"></i>Edit</button>
-                    <button class="dropdown-item text-danger token-delete" data-id="${
-                      token._id
-                    }"><i class="ti ti-trash me-2"></i>Delete</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center mb-3">
-                <p class="me-2 mb-0 fw-medium" id="token-${token._id}">******************</p>
-                  <span class="text-muted cursor-pointer me-2 token-show" data-id="${token._id}" data-token="${
-          token.accessToken
-        }"><i class="ti ti-eye ti-sm"></i></span>
-                <span class="text-muted cursor-pointer token-copy" data-token="${
-                  token.accessToken
-                }"><i class="ti ti-copy ti-sm"></i></span>
-              </div>
-              <span class="text-muted">Created at ${token.formattedDate}</span>
-            </div>
-          </div>`);
+        $('#listTokens').append(
+          '<div class="col-md-6 col-xl-4 mb-4">' +
+            '<div class="card card-key">' +
+            '<div class="card-header header-elements">' +
+            '<h5 class="mb-0 me-2">' +
+            token.name +
+            '</h5>' +
+            '<div class="card-header-elements">' +
+            '<span class="badge bg-' +
+            (token.isActive ? 'success' : 'danger') +
+            ' rounded-pill">' +
+            (token.isActive ? 'Active' : 'inActive') +
+            '</span>' +
+            '</div>' +
+            '<div class="card-header-elements ms-auto">' +
+            dropdown +
+            '</div>' +
+            '</div>' +
+            '<div class="card-body">' +
+            '<div class="d-flex align-items-center">' +
+            '<p class="me-2 mb-0 fw-medium" id="key-' +
+            token._id +
+            '">******************</p> ' +
+            '<span class="text-muted cursor-pointer me-2 token-show" data-id="' +
+            token._id +
+            '" data-token="' +
+            token.accessToken +
+            '"><i class="ti ti-eye ti-sm"></i></span>' +
+            '<span class="text-muted cursor-pointer token-copy" data-token="' +
+            token.accessToken +
+            '"><i class="ti ti-copy ti-sm"></i></span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="card-footer">' +
+            '<span class="text-muted">Created at ' +
+            token.formattedDate +
+            '</span>' +
+            '</div>' +
+            '</div>' +
+            '</div>'
+        );
       });
     });
   }

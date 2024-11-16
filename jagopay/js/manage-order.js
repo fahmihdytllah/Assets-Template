@@ -68,13 +68,19 @@ $(function () {
           targets: 1,
           render: function (data, type, full, meta) {
             var date = new Date(full.updatedAt);
+            var formattedTime = date.toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+
             var formattedDate = date.toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric',
               year: 'numeric',
               time: 'numeric',
             });
-            return '<span class="text-nowrap">' + formattedDate + '</span>';
+
+            return '<span class="text-nowrap">' + formattedDate + ' ' + formattedTime + '</span>';
           },
         },
         {
@@ -184,7 +190,7 @@ $(function () {
           },
         },
       ],
-      order: [3, 'asc'], //set any columns order asc/desc
+      // order: [3, 'asc'], //set any columns order asc/desc
       dom:
         '<"card-header py-0 d-flex flex-column flex-md-row align-items-center"<f><"d-flex align-items-center justify-content-md-end gap-2 justify-content-center"l<"dt-action-buttons"B>>' +
         '>t' +
