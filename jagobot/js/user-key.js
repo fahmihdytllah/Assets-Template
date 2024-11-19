@@ -252,14 +252,20 @@ $(document).ready(function () {
   $(document).on('click', '.btn-buy', function () {
     const id = $(this).data('id');
     const type = $(this).data('type');
+
     mode = 'new';
+    billingType.prop('disabled', false);
+
     updateBilling(id, type);
   });
 
   $(document).on('click', '.btn-renew', function () {
     const id = $(this).data('id');
     const type = $(this).data('type');
+
     mode = 'renew';
+    billingType.prop('disabled', true);
+
     updateBilling(id, type);
   });
 
