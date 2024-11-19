@@ -111,10 +111,11 @@ $(function () {
           responsivePriority: 1,
           targets: 1,
           render: function (data, type, full, meta) {
-            var $row_output =
+            const bannerImage = full?.banner || 'https://ui-avatars.com/api/?background=random&name=' + full.title;
+            const $row_output =
               '<div class="d-flex justify-content-start align-items-center ">' +
               '<img src="' +
-              full.banner +
+              bannerImage +
               '" alt="' +
               full.title +
               '" class="rounded me-2 w-px-100">' +
