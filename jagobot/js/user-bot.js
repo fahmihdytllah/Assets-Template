@@ -248,6 +248,14 @@ $(document).ready(function () {
         return countryA.localeCompare(countryB);
       });
     } else {
+      localDataBot.sort((a, b) => {
+        if (a.isActive !== b.isActive) {
+          return b.isActive - a.isActive;
+        }
+
+        return a.keyName.localeCompare(b.keyName);
+      });
+
       filteredData = localDataBot;
     }
 
@@ -375,7 +383,7 @@ $(document).ready(function () {
         $.unblockUI();
         $('#bot-' + id).remove();
 
-        const indexBot = localDataBot.findIndex(({ id }) => id === id);
+        const indexBot = localDataBot.findIndex(({ _id }) => _id === id);
         if (indexBot !== -1) {
           localDataBot.splice(indexBot, 1);
         }
@@ -482,15 +490,17 @@ $(document).ready(function () {
   }
 
   function populateCategoryFilter(categoryTotals) {
-    let $select = $('#byKey');
-    for (let category in categoryTotals) {
+    const $select = $('#byKey');
+    const sortedCategory = Object.fromEntries(Object.entries(categoryTotals).sort(([a], [b]) => a.localeCompare(b)));
+
+    for (let category in sortedCategory) {
       $select.append(
         '<option value="' +
           category +
           '" data-type="byKey">' +
           category +
           ' (' +
-          categoryTotals[category] +
+          sortedCategory[category] +
           ') </option>'
       );
     }
