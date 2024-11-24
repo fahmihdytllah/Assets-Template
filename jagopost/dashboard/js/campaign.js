@@ -10,6 +10,7 @@ $(function () {
     campaignId = null;
 
   loadCampaigns();
+
   loadDataGrapgh();
 
   keywords = new Tagify(document.querySelector('#keywords'), {
@@ -194,9 +195,10 @@ $(function () {
       listBlogs = res.listBlogs;
 
       /** Load blogs */
-      if (listBlogs?.length) {
+      if (res.listBlogs[res.platform]?.length) {
         $('#selectBlogs').html('');
-        listBlogs[res.platform].forEach((blog) => {
+
+        res.listBlogs[res.platform].forEach((blog) => {
           $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
         });
 
@@ -329,6 +331,7 @@ $(function () {
       $('#typeSearch').val(res.data?.typeSearch).trigger('change');
       $('#language').val(res.data?.language).trigger('change');
       $('#selectPlatforms').val(res.data?.platform).trigger('change');
+
       $('#selectBlogs').val(res.data?.blogId).trigger('change');
 
       keywords.removeAllTags();

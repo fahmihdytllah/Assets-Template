@@ -333,7 +333,8 @@ $(function () {
   $('.datatables-basic tbody').on('click', '.delete-post', function () {
     const $this = $(this);
     const postID = $this.data('id');
-    const url = blogID === 'wp' ? 'posts/' + postID : 'posts/' + blogID + '/' + postID;
+
+    const url = blogID === 'wp' ? '/u/w/posts/' + postID : '/u/b/posts/' + blogID + '/' + postID;
 
     Swal.fire({
       title: 'Are you sure?',
