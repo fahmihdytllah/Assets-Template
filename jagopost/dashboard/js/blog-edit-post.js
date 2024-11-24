@@ -1,7 +1,7 @@
 $(function () {
   let formSelectLanguage = $('#formSelectLanguage'),
     formSearchContent = $('#formSearchContent'),
-    blogID = $('#blogID').val(),
+    formEditPost = $('#formEditPost'),
     select2 = $('.select2'),
     clipboardList = [].slice.call(document.querySelectorAll('.clipboard-btn')),
     dataArticles = [],
@@ -110,7 +110,7 @@ $(function () {
     theme: 'snow',
   });
 
-  $('.formEditPost').submit(function (e) {
+  formEditPost.submit(function (e) {
     e.preventDefault();
 
     if ($('#content-text').is(':visible')) {
@@ -122,6 +122,7 @@ $(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       data: $(this).serialize(),
       url: $(this).attr('action'),
@@ -150,22 +151,13 @@ $(function () {
     });
   });
 
-  formSelectLanguage.submit(function (e) {
-    e.preventDefault();
-
-    if (modeLanguage === 'translate') {
-      translateContent();
-    } else {
-      AiContent();
-    }
-  });
-
   function deletPost() {
     $.blockUI({
       message: elementLoader,
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       url: '?',
       type: 'DELETE',
@@ -177,7 +169,7 @@ $(function () {
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary' },
           buttonsStyling: !1,
-        }).then(() => (window.location.href = '/u/b/posts/' + blogID));
+        }).then(() => formEditPost.attr('action'));
       },
       error: function (e) {
         $.unblockUI();
@@ -192,6 +184,17 @@ $(function () {
       },
     });
   }
+
+  /** Smart Tools */
+  formSelectLanguage.submit(function (e) {
+    e.preventDefault();
+
+    if (modeLanguage === 'translate') {
+      translateContent();
+    } else {
+      AiContent();
+    }
+  });
 
   /** Search Content */
   $('#typeFind').change(function () {
