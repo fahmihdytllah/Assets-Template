@@ -51,6 +51,7 @@ $(function () {
         { data: 'customerDetails' },
         { data: 'paymentMethod' } /** paymentMethod */,
         { data: 'status' },
+        { data: 'paymentMethodDetail' },
         { data: '' },
       ],
       columnDefs: [
@@ -150,6 +151,12 @@ $(function () {
             // const logo =
             //   '<img src="' + assetsPath + 'img/icons/payments/' + $method + '.png" alt="' + $method + '" width="29">';
             return full.paymentMethod?.name || 'Default';
+          },
+        },
+        {
+          targets: 6,
+          render: function (data, type, full, meta) {
+            return full?.paymentMethodDetail || '-';
           },
         },
         {
@@ -440,7 +447,7 @@ $(function () {
     });
   }
 
-  $('.datatables-basic tbody').on('click', '.delete-order', function () {
+  $('.datatables-order tbody').on('click', '.delete-order', function () {
     const $this = $(this);
     const id = $this.data('id');
 

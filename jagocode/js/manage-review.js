@@ -131,7 +131,7 @@ $(document).ready(function () {
           responsivePriority: 1,
           render: function (data, type, full, meta) {
             var $name = full.user?.username,
-              $number = full.user?.number ? full.user.number : full.user.email,
+              $number = full.user?.phoneNumber ? full.user.phoneCode + full.user.phoneNumber : full.user.email,
               $avatar = full.user?.avatar;
 
             if ($avatar) {
