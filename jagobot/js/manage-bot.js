@@ -65,7 +65,6 @@ $(document).ready(function () {
       const oldBot = localDataBot[indexBot];
       localDataBot[indexBot] = { ...localDataBot[indexBot], ...bot };
 
-      alert(bot.description);
       /** Update Views */
       const elementBot = $('#bot-' + bot._id);
       if (elementBot) {
