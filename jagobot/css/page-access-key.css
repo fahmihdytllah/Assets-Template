@@ -1,11 +1,17 @@
 .card-key {
-  border: none;
-  border-radius: 10px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: visible;
+  border: none;
+  border-radius: 15px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
 }
 
-.card-keys:hover {
-  transform: translateY(-3px);
+.card-key:hover {
+  transform: translateY(-5px);
+  z-index: 9999;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 1050;
 }

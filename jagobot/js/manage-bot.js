@@ -1,6 +1,7 @@
 $(document).ready(function () {
   let select2 = $('.select2'),
     elementListBots = $('#listBots'),
+    formUpdate = $('#formUpdate'),
     socket = io('/users'),
     localDataBot = [],
     showBots = {},
@@ -64,6 +65,7 @@ $(document).ready(function () {
       const oldBot = localDataBot[indexBot];
       localDataBot[indexBot] = { ...localDataBot[indexBot], ...bot };
 
+      alert(bot.description);
       /** Update Views */
       const elementBot = $('#bot-' + bot._id);
       if (elementBot) {
@@ -105,6 +107,59 @@ $(document).ready(function () {
   });
 
   /** Events jquery */
+
+  /** Update bot  */
+  $(document).on('click', '.bot-update', function () {
+    const id = $(this).data('id');
+
+    $.get('?type=detail&id=' + id, function ({ data }) {
+      $('#botId').val(data._id);
+      $('#accessKey').val(data.keyId);
+      $('#description').val(data.description);
+      $('#modalUpdateBot').modal('show');
+    });
+  });
+
+  formUpdate.submit(function (e) {
+    e.preventDefault();
+
+    formUpdate.block({
+      message: itemLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: '?',
+      data: formUpdate.serialize(),
+      type: 'PUT',
+      success: function (res) {
+        formUpdate.unblock();
+        $('#modalUpdateBot').modal('hide');
+
+        Swal.fire({
+          title: 'Good news!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: false,
+        });
+      },
+      error: function (e) {
+        formUpdate.unblock();
+
+        const msg = e.responseJSON?.msg;
+        Swal.fire({
+          title: 'Bad news!',
+          text: msg ? msg : 'There is an error!',
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          buttonsStyling: false,
+        });
+      },
+    });
+  });
+
   /** Request Stop bot  */
   $(document).on('click', '.bot-stop', function () {
     const id = $(this).data('id');
@@ -134,7 +189,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     Swal.fire({
       title: 'Restart Bot',
-      text: 'Are you sure you want to restart this bot?',
+      text: 'Are you sure you want to restart this bot? The bot will start automatically',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes',
@@ -158,7 +213,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     Swal.fire({
       title: 'Reboot Server',
-      text: 'Are you sure you want to reboot this server bot?',
+      text: 'Are you sure you want to reboot this server bot? The bot will die and cannot start automatically',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes',
@@ -291,14 +346,19 @@ $(document).ready(function () {
       data.forEach((bot) => {
         elementListBots.append(paternBot(bot));
       });
+
+      $('[data-bs-toggle="popover"]').popover();
     }
   }
 
   function paternBot(bot) {
     setUptime(bot);
 
+    /** Collapse deprecated */
+    // <span class="bot-detail me-2" data-id="${bot._id}" data-bs-toggle="collapse" data-bs-target="#detail-${bot._id}" aria-expanded="false" aria-controls="detail-${bot._id}"><i class="ti ti-stack-push ti-sm text-info"></i></span>
+
     return `<div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3" id="bot-${bot._id}">
-      <div class="card bot-card">
+      <div class="card bot-card h-100">
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex justify-content-left align-items-center mb-1">
             <i class="fis fi fi-xs fi-${bot.countryCode.toLowerCase()} rounded-circle fs-1 me-3"></i>
@@ -313,20 +373,25 @@ $(document).ready(function () {
 
           <div class="d-flex align-items-center">
             <span class="bot-stop me-2" data-id="${bot._id}">${setIsPaused(bot)}</span>
-            <span class="bot-detail me-2" data-id="${
-              bot._id
-            }" data-bs-toggle="collapse" data-bs-target="#detail-${bot._id}" aria-expanded="false" aria-controls="detail-${bot._id}"><i class="ti ti-stack-push ti-sm text-info"></i></span>
+            <span class="bot-description me-2" data-bs-toggle="popover" data-bs-placement="top" data-bs-content="${
+              bot?.description || '-'
+            }"><i class="ti ti-info-circle ti-sm text-info"></i></span>
+
             <div class="dropdown dropend">
-              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" data-bs-container="body" aria-expanded="false">
                 <i class="ti ti-dots-vertical"></i>
               </button>
               <div class="dropdown-menu">
-                <button class="dropdown-item server-reboot" data-id="${
+                <button class="dropdown-item bot-update" data-id="${
                   bot._id
-                }"><i class="ti ti-server-2 me-1"></i> Reboot</button>
+                }"><i class="ti ti-edit me-1"></i> Edit</button>
+                <hr class="dropdown-divider">
                 <button class="dropdown-item bot-restart" data-id="${
                   bot._id
                 }"><i class="ti ti-rotate me-1"></i> Restart</button>
+                <button class="dropdown-item server-reboot" data-id="${
+                  bot._id
+                }"><i class="ti ti-server-2 me-1"></i> Reboot</button>
                 <hr class="dropdown-divider">
                 <button class="dropdown-item bot-delete text-danger" data-id="${
                   bot._id
@@ -335,6 +400,7 @@ $(document).ready(function () {
             </div>
           </div>
         </div>
+        
         <div class="collapse mt-3 ${showBots[bot._id] ? '' : 'show'}" id="detail-${bot._id}">
           <ul class="list-unstyled row">
             <div class="col-4">

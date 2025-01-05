@@ -125,18 +125,6 @@ $(function () {
               url +
               '" class="btn btn-sm btn-text-secondary rounded-pill btn-icon item-edit"><i class="ti ti-pencil ti-md"></i></a>'
             );
-
-            return `<div class="d-inline-block">
-              <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                <i class="text-primary ti ti-dots-vertical"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end m-0">
-                <li><a href="${full['url']}" target="_blank" class="dropdown-item"><i class="ti-xs ti ti-eye me-1"></i>Show</a></li>
-                <div class="dropdown-divider"></div>
-                <li><button data-blog="${full.blogId}" data-id="${full['id']}" class="dropdown-item text-danger delete-post"><i class="ti-xs ti ti-trash me-1"></i>Delete</button></li>
-              </ul>
-            </div>
-            <a href="${url}" target="_blank" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>`;
           },
         },
       ],

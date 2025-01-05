@@ -545,25 +545,23 @@ $(document).ready(function () {
           $('#listKeys').append(
             '<div class="col-md-6 col-xl-4 mb-4">' +
               '<div class="card card-key">' +
-              '<div class="card-header header-elements">' +
-              '<h5 class="mb-0 me-2">' +
+              '<div class="card-body">' +
+              '<div class="d-flex justify-content-center justify-content-between">' +
+              '<h5 class="card-title">' +
               key.name +
               '</h5>' +
-              '<div class="card-header-elements">' +
-              '<span class="badge bg-label-info rounded-pill me-1">' +
-              key.type.toUpperCase() +
-              '</span>' +
-              '<span class="badge bg-' +
-              Colors[key.status] +
-              ' rounded-pill">' +
-              key.status.toUpperCase() +
-              '</span>' +
-              '</div>' +
-              '<div class="card-header-elements ms-auto">' +
               (key.type === 'trial' && key.status === 'Expired' ? '' : dropdown) +
               '</div>' +
+              '<div class="d-flex align-items-center mb-6">' +
+              '<span class="badge rounded-pill bg-label-info me-2">' +
+              key.type.capitalize() +
+              '</span>' +
+              '<span class="badge rounded-pill bg-' +
+              Colors[key.status] +
+              '">' +
+              key.status.capitalize() +
+              '</span>' +
               '</div>' +
-              '<div class="card-body">' +
               '<div class="d-flex align-items-center">' +
               '<p class="me-2 mb-0 fw-medium" id="key-' +
               key._id +
@@ -711,5 +709,11 @@ $(document).ready(function () {
         })
       )
       .catch(() => console.log('Gagal mengcopy!'));
+  };
+
+  String.prototype.capitalize = function () {
+    return this.split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 });
