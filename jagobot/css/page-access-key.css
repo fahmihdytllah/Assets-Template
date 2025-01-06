@@ -8,7 +8,7 @@
 
 .card-key:hover {
   transform: translateY(-5px);
-  z-index: 9999;
+  z-index: 5;
 }
 
 .dropdown-menu {
