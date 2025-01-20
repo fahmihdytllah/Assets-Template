@@ -8,7 +8,10 @@ $.fn.extend({
 });
 
 $(document).ready(function () {
+  const btnLoginAdsense = $('.btn-login-adsense');
+
   let cardColor, headingColor, legendColor, labelColor, borderColor;
+
   if (isDarkStyle) {
     cardColor = config.colors_dark.cardColor;
     labelColor = config.colors_dark.textMuted;
@@ -52,6 +55,32 @@ $(document).ready(function () {
     loadEarningReportYearly();
     loadStatistik();
   });
+
+  /**
+   * Grant Access Google Adsense
+   */
+  if (btnLoginAdsense) {
+    btnLoginAdsense.click(function () {
+      thirdPartyAccess('google-adsense', {
+        onSuccess: (res) => {
+          Swal.fire({
+            title: 'Good News!',
+            text: res.msg,
+            icon: 'success',
+            customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          }).then(() => location.reload());
+        },
+        onError: (err) => {
+          Swal.fire({
+            title: 'Bad News!',
+            text: err.msg,
+            icon: 'error',
+            customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          });
+        },
+      });
+    });
+  }
 
   // Earning Reports Tabs Function
   function EarningReportsBarChart(arrayData, arrayCategory, highlightData) {
