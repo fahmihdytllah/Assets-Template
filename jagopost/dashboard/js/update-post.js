@@ -1,26 +1,31 @@
 $(function () {
-  let formSelectLanguage = $('#formSelectLanguage'),
-    formSearchContent = $('#formSearchContent'),
-    blogID = $('#blogID').val(),
-    select2 = $('.select2'),
-    clipboardList = [].slice.call(document.querySelectorAll('.clipboard-btn')),
-    dataArticles = [],
-    dataImages = [],
-    modeLanguage = null,
-    tagify = null,
-    editor = null;
+  const formSelectLanguage = $('#formSelectLanguage');
+  const formSearchContent = $('#formSearchContent');
+  const formEditPost = $('#formEditPost');
+  const select2 = $('.select2');
+  const clipboardList = [].slice.call(document.querySelectorAll('.clipboard-btn'));
 
-  loadLabels(blogID);
-  loadDataSocial();
+  let dataArticles = [];
+  let dataImages = [];
+  let modeLanguage = null;
+  let editor = null;
+  let tagify = null;
 
+  loadLabels();
+
+  /** Smart Tools */
   $(document).on('click', '.btn-ai', function () {
     Swal.fire({
-      text: 'Are you sure, want to use AI Content',
-      icon: 'warning',
-      showCancelButton: !0,
-      confirmButtonText: 'Yes',
-      customClass: { confirmButton: 'btn btn-primary me-2', cancelButton: 'btn btn-label-secondary' },
-      buttonsStyling: !1,
+      title: 'Are you sure?',
+      html: 'want to use AI Content',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, use it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
     }).then(function (e) {
       if (e.value) {
         modeLanguage = 'ai';
@@ -31,12 +36,16 @@ $(function () {
 
   $(document).on('click', '.btn-spin', function () {
     Swal.fire({
-      text: 'Are you sure you want to spin this content?',
-      icon: 'warning',
-      showCancelButton: !0,
-      confirmButtonText: 'Yes',
-      customClass: { confirmButton: 'btn btn-primary me-2', cancelButton: 'btn btn-label-secondary' },
-      buttonsStyling: !1,
+      title: 'Are you sure?',
+      html: 'want to Spin this Content',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, use it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
     }).then(function (e) {
       if (e.value) {
         spinContent();
@@ -46,16 +55,40 @@ $(function () {
 
   $(document).on('click', '.btn-translate', function () {
     Swal.fire({
-      text: 'Are you sure you want to translate this content?',
-      icon: 'warning',
-      showCancelButton: !0,
-      confirmButtonText: 'Yes',
-      customClass: { confirmButton: 'btn btn-primary me-2', cancelButton: 'btn btn-label-secondary' },
-      buttonsStyling: !1,
+      title: 'Are you sure?',
+      html: 'want to Translate this Content',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, use it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
     }).then(function (e) {
       if (e.value) {
         modeLanguage = 'translate';
         $('#modalSelectLanguage').modal('show');
+      }
+    });
+  });
+  /** /Smart Tools */
+
+  $(document).on('click', '.btn-delete', function () {
+    Swal.fire({
+      title: 'Are you sure?',
+      html: 'Want to delete this post permanently',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, use it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
+    }).then(function (e) {
+      if (e.value) {
+        deletPost();
       }
     });
   });
@@ -76,21 +109,12 @@ $(function () {
     }
   });
 
-  $('#select-blogs').on('select2:select', function (e) {
-    let _blogID = e.params.data.id;
-
-    $('#blogID').val(_blogID);
-    loadLabels(_blogID);
-  });
-
   const fullToolbar = [
-    [{ font: [] }, { size: [] }],
+    [{ font: [] }, { size: [] }, { header: [1, 2, 3, 4, 5, 6, false] }],
     ['bold', 'italic', 'underline', 'strike'],
-    [{ color: [] }, { background: [] }],
-    [{ script: 'super' }, { script: 'sub' }],
-    [{ header: '1' }, { header: '2' }, 'blockquote', 'code-block'],
-    [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-    [{ direction: 'rtl' }],
+    [{ color: [] }, { background: [] }, { script: 'super' }, { script: 'sub' }],
+    ['direction', { align: [] }, { indent: '-1' }, { indent: '+1' }],
+    [{ list: 'ordered' }, { list: 'bullet' }, 'blockquote', 'code-block'],
     ['link', 'image', 'video', 'formula'],
     ['clean'],
   ];
@@ -105,11 +129,11 @@ $(function () {
     theme: 'snow',
   });
 
-  $('.formNewPost').submit(function (e) {
+  formEditPost.submit(function (e) {
     e.preventDefault();
 
     if ($('#content-text').is(':visible')) {
-      $('#content-html').val($('.ql-editor').html());
+      $('#content-html').val(editor.root.innerHTML);
     }
 
     $.blockUI({
@@ -121,34 +145,65 @@ $(function () {
     $.ajax({
       data: $(this).serialize(),
       url: $(this).attr('action'),
-      type: 'POST',
+      type: 'PUT',
       success: function (res) {
         $.unblockUI();
+
         Swal.fire({
-          title: 'Good job!',
+          title: 'Good News!',
           text: res.msg,
           icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
-        }).then(() => {
-          const url = blogID === 'wp' ? '/u/w/posts' : '/u/b/posts/';
-          window.location.href = url;
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
       error: function (e) {
         $.unblockUI();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
   });
 
+  function deletPost() {
+    $.blockUI({
+      message: elementLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: '?',
+      type: 'DELETE',
+      success: function (res) {
+        $.unblockUI();
+        Swal.fire({
+          title: 'Good News!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+        }).then(() => (location.href = formEditPost.attr('action')));
+      },
+      error: function (e) {
+        $.unblockUI();
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
+        Swal.fire({
+          title: 'Bad News!',
+          text: msg,
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+        });
+      },
+    });
+  }
+
+  /** Smart Tools */
   formSelectLanguage.submit(function (e) {
     e.preventDefault();
 
@@ -158,62 +213,6 @@ $(function () {
       AiContent();
     }
   });
-
-  $('.pinterestShare').change(function () {
-    if ($(this).is(':checked')) {
-      $('#displaySelectBoard').show();
-    } else {
-      $('#displaySelectBoard').hide();
-    }
-  });
-
-  $('.facebookShare').change(function () {
-    if ($(this).is(':checked')) {
-      $('#displaySelectPage').show();
-    } else {
-      $('#displaySelectPage').hide();
-    }
-  });
-
-  function loadDataSocial() {
-    $.get('/api/graphql?use=social', function (res) {
-      if (res.isLoggedPinterest) {
-        $('#selectBoard').html('');
-        res.listBoards.forEach((board) => {
-          $('#selectBoard').append(`<option value="${board.id}">${board.name}</option>`);
-        });
-
-        $('.pinterestShare').prop('disabled', false);
-      } else {
-        $('.pinterestShare').prop('disabled', true);
-        $('#displaySelectBoard').hide();
-      }
-
-      if (res.isLoggedFacebook) {
-        $('#selectPage').html('');
-        res.listPages.forEach((page) => {
-          $('#selectPage').append(`<option value="${page.id}[]${page.access_token}">${page.name}</option>`);
-        });
-
-        $('.facebookShare').prop('disabled', false);
-      } else {
-        $('.facebookShare').prop('disabled', true);
-        $('#displaySelectPage').hide();
-      }
-
-      if (res.isLoggedTwitter) {
-        $('.twitterShare').prop('disabled', false);
-      } else {
-        $('.twitterShare').prop('disabled', true);
-      }
-
-      if (res.isLoggedLinkedin) {
-        $('.linkedinShare').prop('disabled', false);
-      } else {
-        $('.linkedinShare').prop('disabled', true);
-      }
-    });
-  }
 
   /** Search Content */
   $('#typeFind').change(function () {
@@ -261,22 +260,21 @@ $(function () {
           loadArticles(dataArticles);
         }
         Swal.fire({
-          title: 'Good job!',
+          title: 'Good News!',
           text: 'Successfully searched for article content',
           icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
       error: function (e) {
         formSearchContent.unblock();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
@@ -320,24 +318,22 @@ $(function () {
       url: '/u/tool/search-content?',
       type: 'POST',
       success: function (res) {
-        $('#title').val('');
-        $('.ql-editor').html('');
-
-        $('#title').val(res.title);
-        editor.clipboard.dangerouslyPasteHTML(res.content);
-
+        $('#resultTitle').val(res.title);
+        $('#resultContent').val(res.content);
+        $('#isImgResult').hide();
         $('#listSearchs').unblock();
         $('#modalSearchContent').modal('hide');
+        $('#modalResultContent').modal('show');
       },
       error: function (e) {
         $('#listSearchs').unblock();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
@@ -387,22 +383,21 @@ $(function () {
         $('#modalSelectLanguage').modal('hide');
         formSelectLanguage.unblock();
         Swal.fire({
-          title: 'Good job!',
+          title: 'Good News!',
           text: 'Successfully regenerated content with AI',
           icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
       error: function (e) {
         formSelectLanguage.unblock();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
@@ -426,22 +421,21 @@ $(function () {
         $.unblockUI();
         editor.clipboard.dangerouslyPasteHTML(res.content);
         Swal.fire({
-          title: 'Good job!',
-          text: res.msg,
+          title: 'Good News!',
+          text: d.msg,
           icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
       error: function (e) {
         $.unblockUI();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
@@ -470,49 +464,39 @@ $(function () {
         const result = res.content.split('[]');
         $('#title').val(result[1]);
         editor.clipboard.dangerouslyPasteHTML(result[1]);
+        tagify.addTags(res.labels);
 
         $('#modalSelectLanguage').modal('hide');
         formSelectLanguage.unblock();
+
         Swal.fire({
-          title: 'Good job!',
+          title: 'Good News!',
           text: 'Successfully translated content.',
           icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
       error: function (e) {
         formSelectLanguage.unblock();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
   }
 
-  const updateTagify = (data) => {
-    if (!tagify) {
-      const formLabel = document.querySelector('#labels');
-      tagify = new Tagify(formLabel, {
-        whitelist: data,
+  function loadLabels() {
+    $.getJSON('?type=getLabel', function (res) {
+      tagify = new Tagify(document.querySelector('#labels'), {
+        whitelist: res,
         maxTags: 10,
         dropdown: { maxItems: 20, classname: '', enabled: 0, closeOnSelect: !1 },
       });
-    } else {
-      tagify.settings.whitelist = data;
-      tagify.removeAllTags();
-      tagify.addTags([]);
-    }
-  };
-
-  function loadLabels(id) {
-    $.getJSON('?type=getLabel&id=' + id, function (res) {
-      updateTagify(res);
     });
   }
 
@@ -545,7 +529,6 @@ $(function () {
       clipboardEl.setAttribute('disabled', true);
     });
   }
-
   function getRandomItems(arr, num) {
     const clonedArray = [...arr];
 

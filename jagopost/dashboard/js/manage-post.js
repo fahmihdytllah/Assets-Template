@@ -1,12 +1,13 @@
 $(function () {
-  let dataPostsTable = $('.datatables-basic'),
-    blogID = $('#blogID').val(),
-    select2 = $('.select2'),
-    formSelectLanguage = $('#formSelectLanguage'),
-    formSelectIndexer = $('#formSelectIndexer'),
-    formSelectSocial = $('#formSelectSocial'),
-    isModalSocialShow = false,
-    dataPosts;
+  const dataPostsTable = $('.datatables-basic');
+  const select2 = $('.select2');
+  const formSelectLanguage = $('#formSelectLanguage');
+  const formSelectIndexer = $('#formSelectIndexer');
+  const formSelectSocial = $('#formSelectSocial');
+
+  let isModalSocialShow = false;
+  let blogID = $('#blogID').val();
+  let dataPosts;
 
   if (select2.length) {
     select2.each(function () {
@@ -20,7 +21,7 @@ $(function () {
 
   $('#myBlog').on('change', function (e) {
     blogID = $(this).val();
-    dataPosts.ajax.url(`?type=json&id=${blogID}`).load();
+    dataPosts.ajax.url('?type=json&id=' + blogID).load();
   });
 
   if (dataPostsTable.length) {
@@ -118,6 +119,8 @@ $(function () {
               full.blogId +
               '" data-id="' +
               full['id'] +
+              '" data-title="' +
+              full['title'] +
               '" class="dropdown-item text-danger delete-post"><i class="ti-xs ti ti-trash me-1"></i>Delete</button></li>' +
               '</ul>' +
               '</div>' +
@@ -142,7 +145,6 @@ $(function () {
           extend: 'collection',
           className: 'btn btn-label-primary dropdown-toggle me-4 waves-effect waves-light border-none',
           text: '<i class="ti ti-tools ti-xs me-sm-1"></i> <span class="d-none d-sm-inline-block">Smart Tools</span>',
-
           buttons: [
             {
               text: '<i class="ti ti-sparkles me-1" ></i>AI Content',
@@ -151,7 +153,7 @@ $(function () {
                 Swal.fire({
                   title: 'Are you sure?',
                   text: 'Would you like to rewrite this post with AI Content!',
-                  icon: 'warning',
+                  icon: 'question',
                   showCancelButton: true,
                   confirmButtonText: 'Yes, rewrite it!',
                   customClass: {
@@ -173,7 +175,7 @@ $(function () {
                 Swal.fire({
                   title: 'Are you sure?',
                   text: 'Do you want to share this post on social media!',
-                  icon: 'warning',
+                  icon: 'question',
                   showCancelButton: true,
                   confirmButtonText: 'Yes, share it!',
                   customClass: {
@@ -200,7 +202,7 @@ $(function () {
                 Swal.fire({
                   title: 'Are you sure?',
                   text: 'Would you like to index this post!',
-                  icon: 'warning',
+                  icon: 'question',
                   showCancelButton: true,
                   confirmButtonText: 'Yes, index it!',
                   customClass: {
@@ -222,7 +224,7 @@ $(function () {
                 Swal.fire({
                   title: 'Are you sure?',
                   text: 'Do you want to delete this post!',
-                  icon: 'warning',
+                  icon: 'question',
                   showCancelButton: true,
                   confirmButtonText: 'Yes, delete it!',
                   customClass: {
@@ -240,10 +242,10 @@ $(function () {
           ],
         },
         {
-          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add New Post</span>',
+          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Create Post</span>',
           className: 'create-new btn btn-primary waves-effect waves-light',
           action: function () {
-            const url = blogID === 'wp' ? '/u/w/posts/new' : '/u/b/posts/new?id=' + blogID;
+            const url = blogID === 'wp' ? '/u/w/posts/create' : '/u/b/posts/create?id=' + blogID;
             window.location = url;
           },
         },
@@ -284,7 +286,7 @@ $(function () {
         $('.card-header').after('<hr class="my-0">');
       },
     });
-    $('div.head-label').html('<h5 class="card-title mb-0">My Posts</h5>');
+    $('div.head-label').html('<h5 class="card-title mb-0">Manage Posts</h5>');
   }
 
   formSelectLanguage.submit(function (e) {
@@ -321,13 +323,14 @@ $(function () {
   $('.datatables-basic tbody').on('click', '.delete-post', function () {
     const $this = $(this);
     const postID = $this.data('id');
+    const title = $this.data('title');
 
     const url = blogID === 'wp' ? '/u/w/posts/' + postID : '/u/b/posts/' + blogID + '/' + postID;
 
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to delete this post!',
-      icon: 'warning',
+      html: 'Want to delete <strong>' + title + '</strong> post permanently',
+      icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, delete it!',
       customClass: {
@@ -346,24 +349,26 @@ $(function () {
         $.ajax({
           url,
           type: 'DELETE',
-          success: function (d) {
+          success: function (res) {
             $.unblockUI();
             dataPosts.row($this.parents('tr')).remove().draw();
+
             Swal.fire({
-              title: 'Good job!',
-              text: d.msg,
+              title: 'Good News!',
+              text: res.msg,
               icon: 'success',
-              customClass: { confirmButton: 'btn btn-success waves-effect waves-light' },
+              customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
             });
           },
           error: function (e) {
             $.unblockUI();
-            const msg = e.responseJSON.msg;
+            const msg = e.responseJSON?.msg || 'There is an error!';
+
             Swal.fire({
-              title: 'Upss!',
-              text: msg ? msg : 'There is an error!',
+              title: 'Bad News!',
+              text: msg,
               icon: 'error',
-              customClass: { confirmButton: 'btn btn-primary' },
+              customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
             });
           },
         });
@@ -439,11 +444,10 @@ $(function () {
 
     if (_dataPosts.length <= 0) {
       Swal.fire({
-        title: 'Upss!',
+        title: 'Bad News!',
         text: 'Please select a post first!',
         icon: 'error',
-        customClass: { confirmButton: 'btn btn-primary' },
-        buttonsStyling: !1,
+        customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
       });
     } else {
       $.blockUI({
@@ -460,16 +464,15 @@ $(function () {
           ...{ blogID, type: selectedType, dataPosts: _dataPosts },
           ...data,
         }),
-        success: function (d) {
+        success: function (res) {
           $.unblockUI();
           $('#modalSelectLanguage').modal('hide');
 
           Swal.fire({
-            title: 'Good job!',
-            text: d.msg,
+            title: 'Good News!',
+            text: res.msg,
             icon: 'success',
-            customClass: { confirmButton: 'btn btn-primary' },
-            buttonsStyling: !1,
+            customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
           }).then(() => {
             if (selectedType === 'delete' || selectedType === 'ai') {
               dataPosts.ajax.reload();
@@ -478,13 +481,13 @@ $(function () {
         },
         error: function (e) {
           $.unblockUI();
-          const msg = e.responseJSON.msg;
+          const msg = e.responseJSON?.msg || 'There is an error!';
+
           Swal.fire({
-            title: 'Upss!',
-            text: msg ? msg : 'There is an error!',
+            title: 'Bad News!',
+            text: msg,
             icon: 'error',
-            customClass: { confirmButton: 'btn btn-primary' },
-            buttonsStyling: !1,
+            customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
           });
         },
       });

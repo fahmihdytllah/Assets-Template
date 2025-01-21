@@ -1,198 +1,132 @@
 $(function () {
-  const dataCampaignTable = $('.datatables-basic');
+  const select2 = $('.select2');
   const formCampaign = $('#formCampaign');
+  const loader = $('.loader');
 
-  let idCampaign = false;
-  let dataCampaign;
+  let isModeAdd = true;
+  let isGraphLoaded = false;
+  let keywords = null;
+  let campaignId = null;
 
-  let colors = {
-    free: 'label-secondary',
-    elite: 'label-warning',
-    premium: 'label-info',
-    advanced: 'label-primary',
-  };
+  let LOCAL_GRAPH = {};
+  let LOCAL_BLOGS = {};
 
-  $(document).on('click', '.method-edit', function () {
-    idCampaign = $(this).data('id');
-    campaignDetail(idCampaign);
+  loadCampaigns();
+
+  loadDataGrapgh();
+
+  keywords = new Tagify(document.querySelector('#keywords'), {
+    whitelist: $('#suggestsQuery').val().split(', '),
+    maxTags: 10,
+    dropdown: { maxItems: 20, classname: '', enabled: 0, closeOnSelect: false },
   });
 
-  if (dataCampaignTable.length) {
-    dataCampaign = dataCampaignTable.DataTable({
-      ajax: {
-        url: '?type=json',
-        type: 'GET',
-        beforeSend: function () {
-          $('.card').block({
-            message: elementLoader,
-            css: { backgroundColor: 'transparent', border: '0' },
-            overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
-          });
-        },
-        complete: function () {
-          $('.card').unblock();
-        },
-      },
-      columns: [
-        { data: '_id' },
-        { data: 'name' },
-        { data: 'userId' },
-        { data: 'subscription' },
-        { data: 'isActive' },
-        { data: '' },
-      ],
-      columnDefs: [
-        {
-          className: 'control',
-          orderable: false,
-          searchable: false,
-          responsivePriority: 2,
-          targets: 0,
-          render: function (data, type, full, meta) {
-            return '';
-          },
-        },
-        {
-          responsivePriority: 1,
-          targets: 1,
-        },
-        {
-          targets: 2,
-          render: function (data, type, full, meta) {
-            var $name = full.userId.name,
-              $number = full.userId.phoneNumber || full.userId.email,
-              $avatar = full.userId.avatar || null;
-
-            if ($avatar) {
-              // For Avatar image
-              var $output = '<img src="' + $avatar + '" alt="Avatar" class="rounded-circle">';
-            } else {
-              // For Avatar badge
-              var stateNum = Math.floor(Math.random() * 6);
-              var states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
-              var $state = states[stateNum],
-                $initials = $name.match(/\b\w/g) || [];
-              $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-              $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
-            }
-
-            // Creates full output for row
-            var $row_output =
-              '<div class="d-flex justify-content-start align-items-center customer-name">' +
-              '<div class="avatar-wrapper">' +
-              '<div class="avatar me-2">' +
-              $output +
-              '</div>' +
-              '</div>' +
-              '<div class="d-flex flex-column">' +
-              '<a href="#"><span class="fw-medium">' +
-              $name +
-              '</span></a>' +
-              '<small class="text-muted text-nowrap">' +
-              $number +
-              '</small>' +
-              '</div>' +
-              '</div>';
-            return $row_output;
-          },
-        },
-        {
-          targets: 3,
-          render: function (data, type, full, meta) {
-            return (
-              '<span class="badge bg-' +
-              colors[full.subscription.plan] +
-              ' rounded-pill text-capitalize">' +
-              full.subscription.plan +
-              '</span>'
-            );
-          },
-        },
-        {
-          targets: 4,
-          render: function (data, type, full, meta) {
-            return (
-              '<span class="badge ' +
-              (full?.isActive ? 'bg-label-success' : 'bg-label-danger') +
-              ' text-capitalize" >' +
-              (full?.isActive ? 'active' : 'non active') +
-              '</span>'
-            );
-          },
-        },
-        {
-          targets: -1,
-          title: 'Actions',
-          orderable: false,
-          searchable: false,
-          render: function (data, type, full, meta) {
-            return (
-              '<div class="d-inline-block text-nowrap">' +
-              '<button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light method-edit" data-id="' +
-              full._id +
-              '"><i class="ti ti-edit ti-md"></i></button>' +
-              '<button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect waves-light dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></button>' +
-              '<div class="dropdown-menu dropdown-menu-end m-0">' +
-              // '<a href="' +
-              // full.link +
-              // '" target="_blank" class="dropdown-item">View</a>' +
-              '<button class="dropdown-item text-danger btn-delete" data-id="' +
-              full._id +
-              '">Delete</button>' +
-              '</div>' +
-              '</div>'
-            );
-          },
-        },
-      ],
-      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-      displayLength: 7,
-      lengthMenu: [7, 10, 25, 50, 75, 100],
-      buttons: [
-        {
-          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Update Campaign</span>',
-          className: 'btn btn-primary waves-effect waves-light',
-          action: function () {
-            mode = 'edit';
-            $('#modalCampaign').modal('show');
-          },
-        },
-      ],
-      responsive: {
-        details: {
-          display: $.fn.dataTable.Responsive.display.modal({
-            header: function (row) {
-              var data = row.data();
-              return 'Detail Camapign';
-            },
-          }),
-          type: 'column',
-          renderer: function (api, rowIdx, columns) {
-            var data = $.map(columns, function (col, i) {
-              return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
-                ? '<tr data-dt-row="' +
-                    col.rowIndex +
-                    '" data-dt-column="' +
-                    col.columnIndex +
-                    '">' +
-                    '<td>' +
-                    col.title +
-                    ':' +
-                    '</td> ' +
-                    '<td>' +
-                    col.data +
-                    '</td>' +
-                    '</tr>'
-                : '';
-            }).join('');
-
-            return data ? $('<table class="table"/><tbody />').append(data) : false;
-          },
-        },
-      },
+  if (select2.length) {
+    select2.each(function () {
+      var $this = $(this);
+      $this.wrap('<div class="position-relative"></div>').select2({
+        placeholder: 'Select value',
+        dropdownParent: $this.parent(),
+      });
     });
-    $('div.head-label').html('<h5 class="card-title mb-0">Manage Campaign</h5>');
   }
+
+  $('#selectPlatforms').change(function () {
+    const platform = $(this).val();
+    changeBlog(platform);
+  });
+
+  $('.new-campaign').click(function () {
+    isModeAdd = true;
+    formCampaign[0].reset();
+
+    $('#typeSearch').val(['articlecity']).trigger('change');
+    $('#language').val('en').trigger('change');
+    $('.translateContent').prop('disabled', false);
+    $('.spinnerContent').prop('disabled', false);
+
+    $('#displaySelectPage').hide();
+    $('#displaySelectBoard').hide();
+    $('.aiMode').hide();
+    $('.cronSyntax').hide();
+    $('.cronManual').show();
+
+    $('#blogName').val(LOCAL_BLOGS[LOCAL_GRAPH.platform][0].title);
+
+    $('.modalTitle').html('New Campaign');
+    $('.modalDesc').html('Create a New Campaign auto post');
+    $('.btn-create').html('<span class="ti-xs ti ti-api-app me-1"></span>Create Campaign');
+    $('#modalCampaign').modal('show');
+  });
+
+  $('.pinterestShare').change(function () {
+    if ($(this).is(':checked')) {
+      $('#displaySelectBoard').show();
+    } else {
+      $('#displaySelectBoard').hide();
+    }
+  });
+
+  $('.facebookShare').change(function () {
+    if ($(this).is(':checked')) {
+      $('#displaySelectPage').show();
+    } else {
+      $('#displaySelectPage').hide();
+    }
+  });
+
+  $('.cronTime').change(function () {
+    if ($(this).is(':checked')) {
+      $('.cronSyntax').show();
+      $('.cronManual').hide();
+    } else {
+      $('.cronManual').show();
+      $('.cronSyntax').hide();
+    }
+  });
+
+  $('.aiContent').change(function () {
+    if ($(this).is(':checked')) {
+      $('.aiMode').show();
+
+      $('.translateContent').prop('checked', false);
+      $('.translateContent').prop('disabled', true);
+      $('.spinnerContent').prop('checked', false);
+      $('.spinnerContent').prop('disabled', true);
+    } else {
+      $('.aiMode').hide();
+      $('.translateContent').prop('disabled', false);
+      $('.spinnerContent').prop('disabled', false);
+    }
+  });
+
+  $('#listCampaigns').on('click', '.edit-campaign', function () {
+    const id = $(this).data('id');
+    if (isGraphLoaded) {
+      editCampaign(id);
+    }
+  });
+
+  $('#listCampaigns').on('click', '.delete-campaign', function () {
+    const id = $(this).data('id');
+
+    Swal.fire({
+      title: 'Are you sure?',
+      html: "Want to delete this campaign, can't be recovered",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, remove it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
+      },
+      buttonsStyling: false,
+    }).then(function (result) {
+      if (result.value) {
+        deleteCampaign(id);
+      }
+    });
+  });
 
   formCampaign.submit(function (e) {
     e.preventDefault();
@@ -203,110 +137,412 @@ $(function () {
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
 
-    $.ajax({
-      url: '?id=' + idCampaign,
-      type: 'POST',
-      data: formCampaign.serialize(),
-      success: function (res) {
-        formCampaign.unblock();
-        formCampaign[0].reset();
-        $('#modalCampaign').modal('hide');
-        dataCampaign.ajax.reload();
+    let paramAjax = {};
+    if (isModeAdd) {
+      paramAjax = {
+        url: '?',
+        type: 'POST',
+      };
+    } else {
+      paramAjax = {
+        url: 'campaign/' + campaignId,
+        type: 'PUT',
+      };
+    }
 
-        Swal.fire({
-          title: 'Good job!',
-          text: res.msg,
-          icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
-        });
-      },
-      error: function (e) {
-        formCampaign.unblock();
-        let msg = e.responseJSON?.msg;
-        Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
-          icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
-        });
+    $.ajax({
+      ...paramAjax,
+      ...{
+        data: $(this).serialize(),
+        success: function (res) {
+          formCampaign.unblock();
+          $('#modalCampaign').modal('hide');
+          loadCampaigns();
+
+          Swal.fire({
+            title: 'Good News!',
+            text: res.msg,
+            icon: 'success',
+            customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          });
+        },
+        error: function (e) {
+          formCampaign.unblock();
+          const msg = e.responseJSON?.msg || 'There is an error!';
+
+          Swal.fire({
+            title: 'Bad News!',
+            text: msg,
+            icon: 'error',
+            customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+          });
+        },
       },
     });
   });
 
-  function campaignDetail(id) {
-    $.get('?type=detail&id=' + id, function (res) {
-      mode = 'edit';
+  function changeBlog(platform) {
+    /** Load blogs */
+    $('#selectBlogs').html('');
+    $('#blogName').val(LOCAL_BLOGS[platform][0].title);
 
-      $('#name').val(res.name);
-      $('#campaignId').val(res._id);
+    LOCAL_BLOGS[platform].forEach((blog) => {
+      $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
+    });
 
-      if (res.isActive) {
-        $('#isActive').prop('checked', true);
-      } else {
-        $('#isActive').prop('checked', false);
+    $('#selectBlogs').trigger('change');
+  }
+
+  function loadDataGrapgh() {
+    $.get('/api/graphql?use=social,blog,indexer', function (res) {
+      LOCAL_GRAPH = res;
+      LOCAL_BLOGS = res.listBlogs;
+      isGraphLoaded = true;
+
+      /** Load blogs */
+      if (LOCAL_BLOGS[res.platform]?.length) {
+        $('#selectBlogs').html('');
+        $('#blogName').val(LOCAL_BLOGS[res.platform][0].title);
+
+        LOCAL_BLOGS[res.platform].forEach((blog) => {
+          $('#selectBlogs').append(`<option value="${blog.id}">${blog.title}</option>`);
+        });
+
+        $('#selectBlogs').trigger('change');
       }
 
-      $('#modalCampaign').modal('show');
+      if (res.isLoggedGoogleSearch) {
+        $('.googleIndexer').prop('disabled', false);
+      } else {
+        $('.googleIndexer').prop('disabled', true);
+      }
+
+      if (res.isLoggedPinterest) {
+        $('#selectBoard').html('');
+        res.listBoards.forEach((board) => {
+          $('#selectBoard').append(`<option value="${board.id}">${board.name}</option>`);
+        });
+
+        $('.pinterestShare').prop('disabled', false);
+      } else {
+        $('.pinterestShare').prop('disabled', true);
+        $('#displaySelectBoard').hide();
+      }
+
+      if (res.isLoggedFacebook) {
+        $('#selectPage').html('');
+        res.listPages.forEach((page) => {
+          $('#selectPage').append(
+            `<option data-page="${page.id}" value="${page.id}[]${page.access_token}">${page.name}</option>`
+          );
+        });
+
+        $('.facebookShare').prop('disabled', false);
+      } else {
+        $('.facebookShare').prop('disabled', true);
+        $('#displaySelectPage').hide();
+      }
+
+      if (res.isLoggedTwitter) {
+        $('.twitterShare').prop('disabled', false);
+      } else {
+        $('.twitterShare').prop('disabled', true);
+      }
+
+      if (res.isLoggedLinkedin) {
+        $('.linkedinShare').prop('disabled', false);
+      } else {
+        $('.linkedinShare').prop('disabled', true);
+      }
+
+      if (res.isLoggedBing) {
+        $('.bingIndexer').prop('disabled', false);
+      } else {
+        $('.bingIndexer').prop('disabled', true);
+      }
+
+      if (res.isLoggedYandex) {
+        $('.yandexIndexer').prop('disabled', false);
+      } else {
+        $('.yandexIndexer').prop('disabled', true);
+      }
+
+      $('.new-campaign').prop('disabled', false);
+      $('.new-campaign').html('<span class="ti ti-plus me-2"></span>Create Campaign');
+      $('.edit-campaign').prop('disabled', false);
     });
   }
 
-  $('.datatables-basic tbody').on('click', '.btn-delete', function () {
-    const $this = $(this);
-    const id = $this.data('id');
+  function loadCampaigns() {
+    $('#listCampaigns').html('');
+    loader.show();
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this payment method!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      customClass: {
-        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-        cancelButton: 'btn btn-label-secondary waves-effect waves-light',
-      },
-      buttonsStyling: false,
-    }).then(function (result) {
-      if (result.value) {
-        $.blockUI({
-          message: elementLoader,
-          css: { backgroundColor: 'transparent', border: '0' },
-          overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
-        });
+    $.get('?type=json', function (res) {
+      loader.hide();
 
-        $.ajax({
-          url: '?id=' + id,
-          type: 'DELETE',
-          success: function (d) {
-            $.unblockUI();
-            dataCampaign.row($this.parents('tr')).remove().draw();
-            Swal.fire({
-              title: 'Good job!',
-              text: d.msg,
-              icon: 'success',
-              customClass: { confirmButton: 'btn btn-success waves-effect waves-light' },
-            });
-          },
-          error: function (e) {
-            $.unblockUI();
-            const msg = e.responseJSON.msg;
-            Swal.fire({
-              title: 'Upss!',
-              text: msg ? msg : 'There is an error!',
-              icon: 'error',
-              customClass: { confirmButton: 'btn btn-primary' },
-            });
-          },
+      if (res.data?.length === 0) {
+        $('#listCampaigns').html(`<div class="col-md-12">
+          <div class="bg-lighter rounded p-3 mb-3 position-relative">
+            <span class="text-muted">You don't have an campaign yet.
+          </div>
+        </div>`);
+      } else {
+        res.data.forEach((campaign) => {
+          let keywords = '';
+          campaign.keywords.forEach((keyword) => {
+            keywords += '<span class="badge rounded-pill me-1 mb-1 bg-label-dark fw-medium">' + keyword + '</span>';
+          });
+
+          $('#listCampaigns').append(
+            '<div class="col-md-6 mb-4">' +
+              '<div class="card card-campaign h-100">' +
+              '<div class="card-body">' +
+              '<div class="d-flex justify-content-center justify-content-between">' +
+              '<h5 class="card-title">' +
+              campaign.name +
+              '</h5>' +
+              '<button class="btn dropdown-toggle dropdown-toggle-split hide-arrow cursor-pointer" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>' +
+              '<div class="dropdown-menu">' +
+              '<button class="dropdown-item edit-campaign" data-id="' +
+              campaign._id +
+              '" ' +
+              '><i class="ti ti-edit me-2"></i>Update</button>' +
+              '<div class="dropdown-divider"></div>' +
+              '<button class="dropdown-item text-danger delete-campaign" data-id="' +
+              campaign._id +
+              '" ' +
+              (isGraphLoaded ? '' : 'disabled') +
+              '><i class="ti ti-trash me-2"></i>Delete</button>' +
+              '</div>' +
+              '</div>' +
+              '<div class="d-flex align-items-center mb-6">' +
+              '<span class="badge rounded-pill bg-label-' +
+              (campaign.isActive ? 'success' : 'danger') +
+              ' me-2">' +
+              (campaign.isActive ? 'Running' : 'Stopping') +
+              '</span>' +
+              '<span class="badge rounded-pill bg-label-primary me-2">' +
+              campaign.platform.capitalize() +
+              '</span>' +
+              '<span class="badge rounded-pill bg-label-info">' +
+              (campaign?.additionalData?.blogName || '-') +
+              '</span>' +
+              '</div>' +
+              keywords +
+              '</div>' +
+              '<div class="card-footer">' +
+              '<span class="text-muted">' +
+              campaign.cronText +
+              '</span>' +
+              '</div>' +
+              '</div>' +
+              '</div>'
+          );
         });
       }
     });
-  });
+  }
 
-  // Filter form control to default size
-  // ? setTimeout used for multilingual table initialization
-  setTimeout(() => {
-    $('.dataTables_filter .form-control').removeClass('form-control-sm');
-    $('.dataTables_length .form-select').removeClass('form-select-sm');
-  }, 300);
+  function editCampaign(id) {
+    isModeAdd = false;
+    campaignId = id;
+    formCampaign[0].reset();
+
+    $('.modalTitle').html('Update Campaign');
+    $('.modalDesc').html("Change your campaign data if anything doesn't match");
+    $('.btn-create').html('<span class="ti-xs ti ti-api-app me-1"></span>Save Changes');
+
+    $.get('?type=detail&id=' + id, function (res) {
+      const campaign = res.data;
+
+      $('#name').val(campaign?.name);
+      $('#typeSearch').val(campaign?.typeSearch).trigger('change');
+      $('#language').val(campaign?.language).trigger('change');
+      $('#selectPlatforms').val(campaign?.platform).trigger('change');
+
+      let blogName;
+      if (!campaign?.additionalData?.blogName) {
+        const blog = LOCAL_BLOGS[campaign.platform].find((q) => q.id === campaign.additionalData?.blogId);
+        if (blog) {
+          blogName = blog.title;
+        }
+      }
+
+      $('#selectBlogs').val(campaign.additionalData?.blogId).trigger('change');
+      $('#blogName').val(campaign.additionalData?.blogName || blogName || '-');
+
+      keywords.removeAllTags();
+      keywords.addTags(campaign?.keywords);
+
+      /** scheduling */
+      $('#hours').val(campaign?.hours);
+      $('input[name="days"]').each(function () {
+        var day = $(this).val();
+        if (campaign?.days.includes(day)) {
+          $(this).prop('checked', true);
+        }
+      });
+
+      /** setting */
+      if (campaign?.isActive) {
+        $('.autoPost').prop('checked', true);
+      } else {
+        $('.autoPost').prop('checked', false);
+      }
+
+      if (campaign?.isCronSyntax) {
+        $('#cronSyntax').val(campaign.cronSyntax);
+        $('.cronTime').prop('checked', true);
+        $('.cronSyntax').show();
+        $('.cronManual').hide();
+      } else {
+        $('.cronTime').prop('checked', false);
+        $('.cronSyntax').hide();
+        $('.cronManual').show();
+      }
+
+      if (campaign?.isAiContent) {
+        $('.aiContent').prop('checked', true);
+        $('.aiMode').show();
+        $('input[name="aiMode"][value="' + campaign.aiMode + '"]').prop('checked', true);
+
+        $('.translateContent').prop('checked', false);
+        $('.translateContent').prop('disabled', true);
+        $('.spinnerContent').prop('checked', false);
+        $('.spinnerContent').prop('disabled', true);
+      } else {
+        $('.aiContent').prop('checked', false);
+        $('.aiMode').hide();
+      }
+
+      if (campaign?.isSpinnerContent) {
+        $('.spinnerContent').prop('checked', true);
+      } else {
+        $('.spinnerContent').prop('checked', false);
+      }
+
+      if (campaign?.isTranslateContent) {
+        $('.translateContent').prop('checked', true);
+      } else {
+        $('.translateContent').prop('checked', false);
+      }
+
+      /** indexing */
+      if (!LOCAL_GRAPH.isLoggedBing) {
+        $('.bingIndexer').prop('disabled', true);
+      } else if (campaign?.isBingIndexer) {
+        $('.bingIndexer').prop('disabled', false);
+        $('.bingIndexer').prop('checked', true);
+      } else {
+        $('.bingIndexer').prop('checked', false);
+      }
+
+      if (!LOCAL_GRAPH.isLoggedGoogleSearch) {
+        $('.googleIndexer').prop('disabled', true);
+      } else if (campaign?.isGoogleIndexer) {
+        $('.googleIndexer').prop('disabled', false);
+        $('.googleIndexer').prop('checked', true);
+      } else {
+        $('.googleIndexer').prop('checked', false);
+      }
+
+      if (!LOCAL_GRAPH.isLoggedYandex) {
+        $('.yandexIndexer').prop('disabled', true);
+      } else if (campaign?.isYandexIndexer) {
+        $('.yandexIndexer').prop('disabled', false);
+        $('.yandexIndexer').prop('checked', true);
+      } else {
+        $('.yandexIndexer').prop('checked', false);
+      }
+
+      /** sharer */
+      if (!LOCAL_GRAPH.isLoggedPinterest) {
+        $('.pinterestShare').prop('disabled', true);
+      } else if (campaign?.isPinterestShare) {
+        $('.pinterestShare').prop('disabled', false);
+        $('.pinterestShare').prop('checked', true);
+        $('#selectBoard').val(campaign?.additionalData?.boardId).trigger('change');
+        $('#displaySelectBoard').show();
+      } else {
+        $('.pinterestShare').prop('checked', false);
+        $('#displaySelectBoard').hide();
+      }
+
+      if (!LOCAL_GRAPH.isLoggedFacebook) {
+        $('.facebookShare').prop('disabled', true);
+      } else if (campaign?.isFacebookShare) {
+        let selectedPage = $('#selectPage option[data-page="' + campaign?.additionalData?.pageId + '"]').val();
+        $('.facebookShare').prop('disabled', false);
+        $('.facebookShare').prop('checked', true);
+        $('#selectPage').val(selectedPage).trigger('change');
+        $('#displaySelectPage').show();
+      } else {
+        $('.facebookShare').prop('checked', false);
+        $('#displaySelectPage').hide();
+      }
+
+      if (!LOCAL_GRAPH.isLoggedTwitter) {
+        $('.twitterShare').prop('disabled', true);
+      } else if (campaign?.isTwitterShare) {
+        $('.twitterShare').prop('disabled', false);
+        $('.twitterShare').prop('checked', true);
+      } else {
+        $('.twitterShare').prop('checked', false);
+      }
+
+      if (!LOCAL_GRAPH.isLoggedLinkedin) {
+        $('.linkedinShare').prop('disabled', true);
+      } else if (campaign?.isLinkedinShare) {
+        $('.linkedinShare').prop('disabled', false);
+        $('.linkedinShare').prop('checked', true);
+      } else {
+        $('.linkedinShare').prop('checked', false);
+      }
+
+      setTimeout(function () {
+        $('#modalCampaign').modal('show');
+      }, 200);
+    });
+  }
+
+  function deleteCampaign(id) {
+    $.blockUI({
+      message: elementLoader,
+      css: { backgroundColor: 'transparent', border: '0' },
+      overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
+    });
+
+    $.ajax({
+      url: 'campaign/' + id,
+      type: 'DELETE',
+      success: function (res) {
+        $.unblockUI();
+        loadCampaigns();
+
+        Swal.fire({
+          title: 'Good News!',
+          text: res.msg,
+          icon: 'success',
+          customClass: { confirmButton: 'btn btn-success waves-effect waves-light' },
+        });
+      },
+      error: function (e) {
+        $.unblockUI();
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
+        Swal.fire({
+          title: 'Bad News!',
+          text: msg,
+          icon: 'error',
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
+        });
+      },
+    });
+  }
+
+  String.prototype.capitalize = function () {
+    return this.split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 });
