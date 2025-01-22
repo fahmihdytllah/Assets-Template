@@ -80,7 +80,7 @@ $(function () {
         </div>
         <div class="col-md-3 col-6">
           <div class="d-flex align-items-center">
-            <div class="badge rounded-pill bg-label-secondary me-3 p-2">
+            <div class="badge rounded-pill bg-label-dark me-3 p-2">
               <i class="ti ti-news ti-sm"></i>
             </div>
             <div class="card-info">
@@ -200,18 +200,13 @@ $(function () {
         total = res.chartData.reduce((accumulator, currentValue) => accumulator + currentValue, 0),
         campaignAverageChartConfig = {
           chart: {
-            height: 400,
+            height: 350,
             parentHeightOffset: 0,
             type: 'donut',
           },
           labels: res.categoryData,
           series: res.chartData,
-          colors: [
-            chartColors.donut.series1,
-            chartColors.donut.series2,
-            chartColors.donut.series3,
-            chartColors.donut.series4,
-          ],
+          colors: ['#ff733b', '#ff8e5d', '#ffa87f', '#ffc1a2', '#ffd9c7'],
           stroke: {
             width: 0,
           },
@@ -303,7 +298,7 @@ $(function () {
           ],
         };
 
-      if (!res.categoryData.length && !res.chartData?.length) {
+      if (!res.status) {
         $('#campaignAverageChart').html(`<span class="text-center text-muted">You don't have a post yet...</span>`);
       } else {
         if (typeof campaignAverageChartE1 !== undefined && campaignAverageChartE1 !== null) {
@@ -315,148 +310,113 @@ $(function () {
   }
 
   // Campaign Reports
-  function CampaignReportsBarChart(chartData, categoryData, highlightData) {
-    const basicColor = '#ffcf92',
-      highlightColor = '#FF8C24';
-    var colorArr = [];
-
-    for (let i = 0; i < chartData.length; i++) {
-      if (i === highlightData) {
-        colorArr.push(highlightColor);
-      } else {
-        colorArr.push(basicColor);
-      }
-    }
-
+  function CampaignReportsBarChart(chartData, categoryData, largesIndex) {
     const campaignReportBarChartOpt = {
       chart: {
-        height: 258,
-        parentHeightOffset: 0,
-        type: 'bar',
-        toolbar: {
-          show: false,
+        height: 300,
+        type: 'area',
+        toolbar: false,
+        dropShadow: {
+          enabled: true,
+          top: 18,
+          left: 2,
+          blur: 3,
+          color: config.colors.primary,
+          opacity: 0.15,
         },
       },
-      plotOptions: {
-        bar: {
-          columnWidth: '32%',
-          startingShape: 'rounded',
-          borderRadius: 4,
-          distributed: true,
-          dataLabels: {
-            position: 'top',
+      markers: {
+        size: 6,
+        colors: 'transparent',
+        strokeColors: 'transparent',
+        strokeWidth: 4,
+        discrete: [
+          {
+            fillColor: cardColor,
+            seriesIndex: 0,
+            dataPointIndex: largesIndex,
+            strokeColor: config.colors.primary,
+            strokeWidth: 4,
+            size: 6,
+            radius: 2,
           },
-        },
-      },
-      grid: {
-        show: false,
-        padding: {
-          top: 0,
-          bottom: 0,
-          left: -10,
-          right: -10,
-        },
-      },
-      colors: colorArr,
-      dataLabels: {
-        enabled: true,
-        formatter: function (val) {
-          return val; /** chart data */
-        },
-        offsetY: -20,
-        style: {
-          fontSize: '15px',
-          colors: [legendColor],
-          fontWeight: '500',
-          fontFamily: 'Public Sans',
-        },
+        ],
+        hover: { size: 7 },
       },
       series: [
         {
+          name: 'Total Post',
           data: chartData,
         },
       ],
-      legend: {
-        show: false,
-      },
-      tooltip: {
+      dataLabels: {
         enabled: false,
+      },
+      stroke: {
+        curve: 'smooth',
+        lineCap: 'round',
+      },
+      colors: [config.colors.primary],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: isDarkStyle,
+          shadeIntensity: 0.8,
+          opacityFrom: 0.7,
+          opacityTo: 0.25,
+          stops: [0, 95, 100],
+        },
+      },
+      grid: {
+        show: true,
+        borderColor: borderColor,
+        padding: {
+          // top: -15,
+          // bottom: -10,
+          // left: 15,
+          // right: 10,
+          top: 0,
+          bottom: 0,
+          left: 10,
+          right: 0,
+        },
       },
       xaxis: {
         categories: categoryData,
+        labels: {
+          offsetX: 0,
+          style: {
+            colors: labelColor,
+            fontSize: '13px',
+          },
+        },
         axisBorder: {
-          show: true,
-          color: borderColor,
+          show: false,
         },
         axisTicks: {
           show: false,
         },
-        labels: {
-          style: {
-            colors: labelColor,
-            fontSize: '13px',
-            fontFamily: 'Public Sans',
-          },
+        lines: {
+          show: false,
         },
       },
       yaxis: {
         labels: {
-          offsetX: -15,
+          offsetX: -7,
           formatter: function (val) {
-            // return parseInt(val / 1) + 'k';
-            return val; /** chart data vertical */
+            return val;
           },
           style: {
             fontSize: '13px',
             colors: labelColor,
             fontFamily: 'Public Sans',
           },
-          min: 0,
-          max: 60000,
-          tickAmount: 6,
         },
+        min: 0,
+        tickAmount: 4,
       },
-      responsive: [
-        {
-          breakpoint: 1441,
-          options: {
-            plotOptions: {
-              bar: {
-                columnWidth: '41%',
-              },
-            },
-          },
-        },
-        {
-          breakpoint: 590,
-          options: {
-            plotOptions: {
-              bar: {
-                columnWidth: '61%',
-                borderRadius: 5,
-              },
-            },
-            yaxis: {
-              labels: {
-                show: false,
-              },
-            },
-            grid: {
-              padding: {
-                right: 0,
-                left: -20,
-              },
-            },
-            dataLabels: {
-              style: {
-                fontSize: '12px',
-                fontWeight: '400',
-              },
-            },
-          },
-        },
-      ],
     };
+
     return campaignReportBarChartOpt;
   }
 
@@ -472,7 +432,7 @@ $(function () {
       const campaignReportChartEl = document.querySelector('#campaignReportChart'),
         campaignReportChartConfig = CampaignReportsBarChart(res.chartData, res.categoryData, res.largesIndex);
 
-      if (!res.largesIndex) {
+      if (!res.status) {
         $('#campaignReportChart').html(`<span class="text-center text-muted">You don't have a post yet...</span>`);
       } else {
         if (typeof campaignReportChartEl !== undefined && campaignReportChartEl !== null) {
