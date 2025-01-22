@@ -1,21 +1,5 @@
 'use strict';
 
-/** Inisialisasi Firebase */
-const firebaseConfig = {
-  apiKey: 'AIzaSyClXd1AAB_Nzlm52X4GB7V9TR0Rv8YCu1w',
-  authDomain: 'jago-code.firebaseapp.com',
-  projectId: 'jago-code',
-  storageBucket: 'jago-code.appspot.com',
-  messagingSenderId: '733341114140',
-  appId: '1:733341114140:web:aee7d8fd24e979e9bba4d9',
-  measurementId: 'G-4CDRVEBPJD',
-};
-
-firebase.initializeApp(firebaseConfig);
-
-/** Referensi ke Firebase Storage */
-const storage = firebase.storage();
-
 document.addEventListener('DOMContentLoaded', function (e) {
   (function () {
     const formAccSettings = document.querySelector('#formAccountSettings'),
@@ -229,39 +213,96 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Update/reset user image of account page
     let accountUserImage = document.getElementById('uploadedAvatar');
-    const fileInput = document.querySelector('.account-file-input'),
-      resetFileInput = document.querySelector('.account-image-reset');
+
+    let cropper;
+
+    const fileInput = document.querySelector('.account-file-input');
+    const resetFileInput = document.querySelector('.account-image-reset');
+    const avatarCropped = document.getElementById('avatarCropped');
+
+    const modalCropped = $('#modalCropped');
+    const btnCrop = $('.btn-crop');
+    // const avatarCropped = $('#avatarCropped');
+
+    modalCropped
+      .on('shown.bs.modal', function () {
+        cropper = new Cropper(avatarCropped, {
+          aspectRatio: 1,
+          viewMode: 3,
+        });
+      })
+      .on('hidden.bs.modal', function () {
+        cropper.destroy();
+        cropper = null;
+      });
 
     if (accountUserImage) {
       const resetImage = accountUserImage.src;
       fileInput.onchange = () => {
         if (fileInput.files[0]) {
-          accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+          const previewImage = window.URL.createObjectURL(fileInput.files[0]);
 
           $('.btn-save').prop('disabled', true);
 
-          const file = $('.account-file-input')[0].files[0];
-          if (file) {
-            const storageRef = storage.ref().child('avatars/' + file.name);
-            const uploadTask = storageRef.put(file);
-            uploadTask.on(
-              'state_changed',
-              (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload progress: ' + progress + '%');
-              },
-              (error) => {
-                console.error('Error uploading file: ', error);
-              },
-              () => {
-                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                  $('#avatar').val(downloadURL);
-                  $('.btn-save').prop('disabled', false);
-                });
-              }
-            );
-          }
+          modalCropped.modal('show');
+          avatarCropped.src = previewImage;
         }
+
+        btnCrop.on('click', function () {
+          let initialAvatarURL;
+          let canvas;
+
+          modalCropped.modal('hide');
+
+          if (cropper) {
+            canvas = cropper.getCroppedCanvas({
+              width: 150,
+              height: 150,
+            });
+
+            initialAvatarURL = accountUserImage.src;
+            accountUserImage.src = canvas.toDataURL();
+
+            canvas.toBlob(function (blob) {
+              let formData = new FormData();
+              formData.append('file', blob, 'avatar.jpg');
+
+              $.ajax('https://api.jagocode.my.id/upload?type=avatar&service=aws', {
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                mimeType: 'multipart/form-data',
+                xhr: function () {
+                  var xhr = new XMLHttpRequest();
+                  xhr.upload.onprogress = function (e) {
+                    var percent = '0';
+                    var percentage = '0%';
+
+                    if (e.lengthComputable) {
+                      percent = Math.round((e.loaded / e.total) * 100);
+                      percentage = percent + '%';
+                      console.log('Upload progress: ' + percentage);
+                    }
+                  };
+                  return xhr;
+                },
+                success: function (res) {
+                  const result = JSON.parse(res);
+                  accountUserImage.src = result.fileUrl;
+                  $('#avatar').val(result.fileUrl);
+                },
+                error: function () {
+                  accountUserImage.src = initialAvatarURL;
+                  console.log('Upload error...');
+                },
+                complete: function () {
+                  $('.btn-save').prop('disabled', false);
+                },
+              });
+            });
+          }
+        });
       };
       resetFileInput.onclick = () => {
         fileInput.value = '';
