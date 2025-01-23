@@ -2,10 +2,13 @@
 
 document.addEventListener('DOMContentLoaded', function (e) {
   (function () {
-    const formAccSettings = document.querySelector('#formAccountSettings'),
-      deactivateAcc = document.querySelector('#formAccountDeactivation'),
-      deactivateButton = deactivateAcc.querySelector('.deactivate-account');
+    const formAccSettings = document.querySelector('#formAccountSettings');
+    const deactivateAcc = document.querySelector('#formAccountDeactivation');
+    const deactivateButton = deactivateAcc.querySelector('.deactivate-account');
+    const btnSave = document.querySelector('.btn-save');
+    const formSetting = $('#formAccountSettings');
 
+    const initialUsername = formAccSettings.querySelector('[name="username"]').value.trim();
     if (formAccSettings) {
       const fv = FormValidation.formValidation(formAccSettings, {
         fields: {
@@ -25,19 +28,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 min: 6,
                 message: 'Username must be more than 6 characters',
               },
+              remote: {
+                enabled: false,
+                message: 'Username already exists!',
+                method: 'POST',
+                url: '/api/check-username',
+                delay: 500,
+              },
             },
           },
-          // number: {
-          //   validators: {
-          //     notEmpty: {
-          //       message: 'Please enter number whatsapp'
-          //     },
-          //     stringLength: {
-          //       min: 7,
-          //       message: 'Number must be more than 7 characters'
-          //     }
-          //   }
-          // }
         },
         plugins: {
           trigger: new FormValidation.plugins.Trigger(),
@@ -45,9 +44,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
             eleValidClass: '',
             rowSelector: '.col-md-6',
           }),
+          autoFocus: new FormValidation.plugins.AutoFocus(),
           submitButton: new FormValidation.plugins.SubmitButton(),
-          // Submit the form when all fields are valid
-          // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
         },
         init: (instance) => {
           instance.on('plugins.message.placed', function (e) {
@@ -58,7 +56,21 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
       });
 
-      const formSetting = $('#formAccountSettings');
+      formAccSettings.querySelector('[name="username"]').addEventListener('input', function (e) {
+        const username = e.target.value.trim();
+
+        if (username === initialUsername) {
+          fv.disableValidator('username');
+        } else {
+          fv.enableValidator('username');
+        }
+      });
+
+      fv.on('core.validator.validated', function (e) {
+        if (e.field === 'username' && e.validator === 'remote') {
+          e.result.valid ? btnSave.removeAttribute('disabled') : btnSave.setAttribute('disabled', 'disabled');
+        }
+      });
 
       fv.on('core.form.valid', function () {
         formSetting.block({
@@ -222,7 +234,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     const modalCropped = $('#modalCropped');
     const btnCrop = $('.btn-crop');
-    // const avatarCropped = $('#avatarCropped');
 
     modalCropped
       .on('shown.bs.modal', function () {
