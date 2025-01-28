@@ -34,22 +34,21 @@ $(function () {
         loadData(res);
         $('#result').show();
         Swal.fire({
-          title: 'Good job!',
+          title: 'Good News!',
           text: 'Successfully checked text plagiarism',
           icon: 'success',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
       error: function (e) {
         formTools.unblock();
-        const msg = e.responseJSON.msg;
+        const msg = e.responseJSON?.msg || 'There is an error!';
+
         Swal.fire({
-          title: 'Upss!',
-          text: msg ? msg : 'There is an error!',
+          title: 'Bad News!',
+          text: msg,
           icon: 'error',
-          customClass: { confirmButton: 'btn btn-primary' },
-          buttonsStyling: !1,
+          customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
         });
       },
     });
