@@ -14,21 +14,6 @@ $(function () {
     borderColor = config.colors.borderColor;
   }
 
-  // Chart Colors
-  const chartColors = {
-    donut: {
-      series1: '#FF8C24',
-      series2: '#b36f19',
-      series3: '#ffe7c8',
-      series4: '#ffcf92',
-    },
-    bar: {
-      series1: config.colors.primary,
-      series2: '#7367F0CC',
-      series3: '#7367f099',
-    },
-  };
-
   /** Load data statistic */
   loadStatistic();
 
@@ -51,13 +36,6 @@ $(function () {
 
   $('.refreshLastPost').click(function () {
     loadPost();
-  });
-
-  /** Load activity timeline */
-  loadActivity();
-
-  $('.refreshActivityTimeline').click(function () {
-    loadActivity();
   });
 
   /** Handler Function */
@@ -114,42 +92,6 @@ $(function () {
     });
   }
 
-  function loadActivity() {
-    const colors = {
-      login: 'secondary',
-      register: 'info',
-      updateAccount: 'warning',
-      changePassword: 'danger',
-      upgradePlan: 'success',
-      createCampaign: 'primary',
-    };
-
-    $('.loaderActivity').show();
-    $('.listActivitys').hide();
-
-    $.get('/api/userDashboard?type=activity', function (res) {
-      $('.loaderActivity').hide();
-      $('.listActivitys').show();
-      $('.listActivitys').html('');
-
-      res.data.forEach((activity, index) => {
-        $('.listActivitys').append(`
-          <li class="timeline-item timeline-item-transparent ps-4 ${
-            index === res.data.length - 1 ? 'border-transparent' : ''
-          }">
-            <span class="timeline-point timeline-point-${colors[activity.type]}"></span>
-            <div class="timeline-event">
-              <div class="timeline-header">
-                <h6 class="mb-0">${activity.title}</h6>
-                <small class="text-muted">${activity.updatedAt}</small>
-              </div>
-              <p class="mb-0">${activity.description}</p>
-            </div>
-          </li>`);
-      });
-    });
-  }
-
   function loadPost() {
     $('.loaderPost').show();
     $('.listPosts').hide();
@@ -158,8 +100,9 @@ $(function () {
       $('.loaderPost').hide();
       $('.listPosts').show();
       $('.listPosts').html('');
+      $('.total-post-this-month').html(res.data.totalPostThisMonth);
 
-      if (!res.data?.length) {
+      if (!res.data.items.length) {
         $('.listPosts').append(`
           <tr>
             <td><span class="text-center text-muted">You don't have a post yet...</span></td>
@@ -167,7 +110,7 @@ $(function () {
         `);
       }
 
-      res.data.forEach((post) => {
+      res.data.items.forEach((post) => {
         $('.listPosts').append(`
           <tr>
             <td>
@@ -178,6 +121,7 @@ $(function () {
                 <p class="mb-0 fw-medium">${post.title}</p>
               </div>
             </td>
+            <td>${post.campaignId.name}</td>
             <td>${post.updatedAt}</td>
             <td>
               <a target="_blank" href="${post.url}" data-bs-toggle="tooltip" aria-label="Preview" data-bs-original-title="Preview"><i class="ti ti-eye mx-2 ti-sm"></i></a>
@@ -440,6 +384,64 @@ $(function () {
           campaignReportChart.render();
         }
       }
+    });
+  }
+
+  // Radial bar chart functions
+  function radialBarChart(color, value, show) {
+    const radialBarChartOpt = {
+      chart: {
+        height: show == 'true' ? 58 : 48,
+        width: show == 'true' ? 58 : 38,
+        type: 'radialBar',
+      },
+      plotOptions: {
+        radialBar: {
+          hollow: {
+            size: show == 'true' ? '50%' : '25%',
+          },
+          dataLabels: {
+            show: show == 'true' ? true : false,
+            value: {
+              offsetY: -10,
+              fontSize: '15px',
+              fontWeight: 500,
+              fontFamily: 'Public Sans',
+              color: headingColor,
+            },
+          },
+          track: {
+            background: config.colors_label.secondary,
+          },
+        },
+      },
+      stroke: {
+        lineCap: 'round',
+      },
+      colors: [color],
+      grid: {
+        padding: {
+          top: show == 'true' ? -12 : -15,
+          bottom: show == 'true' ? -17 : -15,
+          left: show == 'true' ? -17 : -5,
+          right: -15,
+        },
+      },
+      series: [value],
+      labels: show == 'true' ? [''] : ['Progress'],
+    };
+    return radialBarChartOpt;
+  }
+
+  const chartProgressList = document.querySelectorAll('.chart-progress');
+  if (chartProgressList) {
+    chartProgressList.forEach(function (chartProgressEl) {
+      const color = config.colors[chartProgressEl.dataset.color],
+        series = chartProgressEl.dataset.series;
+      const progress_variant = chartProgressEl.dataset.progress_variant;
+      const optionsBundle = radialBarChart(color, series, progress_variant);
+      const chart = new ApexCharts(chartProgressEl, optionsBundle);
+      chart.render();
     });
   }
 });
