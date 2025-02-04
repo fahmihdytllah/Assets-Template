@@ -1,0 +1,85 @@
+.bot-card {
+  position: relative;
+  overflow: visible;
+  border: none;
+  border-radius: 15px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  padding: 20px;
+}
+
+.bot-card:hover {
+  transform: translateY(-5px);
+  z-index: 10;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 1050;
+}
+
+.card-body {
+  background-color: #f8f9fa;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.blinking {
+  animation: blink 1s infinite;
+}
+
+[data-type='tooltip'] {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Tooltip text dihasilkan menggunakan ::after dari data-tooltip */
+[data-type='tooltip']::after {
+  content: attr(data-text); /* Ambil teks dari data-tooltip */
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+
+  /* Posisi tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%; /* Tooltip di atas elemen */
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Arrow sebagai bagian dari tooltip */
+[data-type='tooltip']::before {
+  content: '';
+  position: absolute;
+  visibility: hidden;
+  bottom: 100%; /* Tepat di bawah tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Membuat panah */
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tampilkan tooltip dan arrow saat hover */
+[data-type='tooltip']:hover::after,
+[data-type='tooltip']:hover::before {
+  visibility: visible;
+  opacity: 1;
+}
