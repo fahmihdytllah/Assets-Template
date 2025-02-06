@@ -51,7 +51,6 @@ $(document).ready(function () {
           text: d.msg,
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
       error: function (e) {
@@ -62,7 +61,6 @@ $(document).ready(function () {
           text: msg ? msg : 'There is an error!',
           icon: 'error',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
     });
@@ -75,6 +73,7 @@ $(document).ready(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       url: 'notification/' + idNotification,
       type: 'PUT',
@@ -89,7 +88,6 @@ $(document).ready(function () {
           text: d.msg,
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
       error: function (e) {
@@ -100,7 +98,6 @@ $(document).ready(function () {
           text: msg ? msg : 'There is an error!',
           icon: 'error',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
     });
@@ -113,8 +110,9 @@ $(document).ready(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
-      url: 'notification/',
+      url: 'notification/' + '?',
       type: 'PATCH',
       data: $(this).serialize(),
       success: function (d) {
@@ -151,7 +149,7 @@ $(document).ready(function () {
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
 
-    $.get('notification?type=json', function (data) {
+    $.get('?type=json', function (data) {
       $('.card-table').unblock();
 
       data.forEach((notif) => {
@@ -161,11 +159,21 @@ $(document).ready(function () {
           warning: 'alert-circle',
           danger: 'alert-triangle',
         };
+
+        const status =
+          '<span class="badge ' +
+          (notif.isActive ? 'bg-label-success' : 'bg-label-danger') +
+          '" text-capitalized>' +
+          (notif.isActive ? 'Active' : 'Non Active') +
+          '</span>';
+
         $('#listNotifications').append(`<tr>
           <td><i class="ti ti-${icons[notif.icon]} ti-lg text-${notif.icon} me-3"></i> <span class="fw-medium">${
           notif.title
         }</span></td>
           <td>${notif.message}</td>
+          <td>${notif.platform}</td>
+          <td>${status}</td>
           <td>${moment(notif.createdAt).format('llll')}</td>
           <td>
             <div class="dropdown">
@@ -191,15 +199,25 @@ $(document).ready(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       url: 'notification/' + id,
       type: 'GET',
-      success: function (d) {
+      success: function (res) {
         $.unblockUI();
         idNotification = id;
-        $('#editTitle').val(d.title);
-        $('#editIcon').val(d.icon);
-        $('#editMessage').val(d.message);
+
+        $('#editTitle').val(res.title);
+        $('#editIcon').val(res.icon);
+        $('#editMessage').val(res.message);
+        $('#editPlatform').val(res.platform);
+
+        if (res.isActive) {
+          $('#editIsActive').prop('checked', true);
+        } else {
+          $('#editIsActive').prop('checked', false);
+        }
+
         $('#modalEditNotification').modal('show');
       },
       error: function (e) {
@@ -210,7 +228,6 @@ $(document).ready(function () {
           text: msg ? msg : 'There is an error!',
           icon: 'error',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
     });
@@ -222,6 +239,7 @@ $(document).ready(function () {
       css: { backgroundColor: 'transparent', border: '0' },
       overlayCSS: { backgroundColor: '#fff', opacity: 0.8 },
     });
+
     $.ajax({
       url: 'notification/' + id,
       type: 'DELETE',
@@ -233,7 +251,6 @@ $(document).ready(function () {
           text: d.msg,
           icon: 'success',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
       error: function (e) {
@@ -244,7 +261,6 @@ $(document).ready(function () {
           text: msg ? msg : 'There is an error!',
           icon: 'error',
           customClass: { confirmButton: 'btn btn-primary waves-effect waves-light' },
-          buttonsStyling: !1,
         });
       },
     });
